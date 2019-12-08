@@ -23,11 +23,11 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- java-parent -->
+            <!-- java-spring-boot-parent -->
             <dependency>
                 <groupId>com.github.wing-only</groupId>
-                <artifactId>java-parent</artifactId>
-                <version>1.0.0</version>
+                <artifactId>java-spring-boot-parent</artifactId>
+                <version>2.1.7.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
