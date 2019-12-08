@@ -1,0 +1,7 @@
+服务端配置
+<dubbo:service interface="@IServicePackage@.I@ModelName@Service" ref="@variableName@ServiceImpl" loadbalance="roundrobin" retries="3"></dubbo:service>
+<bean id="@variableName@ServiceImpl" class="@ServiceImplPackage@.@ModelName@ServiceImpl"/>
+
+
+消费端配置
+<dubbo:reference id="@variableName@Service" interface="@IServicePackage@.I@ModelName@Service" check="false"/>

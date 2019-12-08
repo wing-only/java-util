@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="@modeclasspath@">
+
+	<sql id="selectAllColumn">
+       @columns@
+	</sql>
+	
+	<sql id="updateColumn">
+		<set>
+@updateDynamicColumns@
+		</set>
+	</sql>
+
+	<sql id="updateAllColumn">
+		SET
+@updateColumns@
+	</sql>
+
+	<sql id="updateColumnEntity">
+		<set>
+@updateColumnEntity@
+		</set>
+	</sql>
+
+	<sql id="updateAllColumnEntity">
+		SET
+@updateAllColumnEntity@
+	</sql>
+
+	<sql id="where">
+		<where>
+@wherecolumns@
+		</where>
+	</sql>
+
+	<sql id="whereParam">
+		<where>
+			<if test="param != null">
+@whereParamColumns@
+			</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="@entityClasspath@">
+		INSERT INTO @tableName@
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+@insertColumns@
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+@insertDynamicColumns@
+		</trim>
+	</insert>
+
+	<insert id="insertAllColumn" parameterType="@entityClasspath@">
+		INSERT INTO @tableName@(
+		@insertAllColumns@
+		) VALUES (
+@insert@
+		)
+	</insert>
+
+	<update id="updateById" parameterType="@entityClasspath@">
+        UPDATE @tableName@ 
+		<include refid="updateColumn" />
+		@ById@
+	</update>
+	<update id="updateAllColumnById" parameterType="@entityClasspath@">
+		UPDATE @tableName@ <include refid="updateAllColumn" />
+		@ById@
+	</update>
+	<update id="update">
+		UPDATE @tableName@ <include refid="update_column_entity" />
+		<include refid="whereParam" />
+	</update>
+
+	<update id="updateAllColumn">
+		UPDATE @tableName@ <include refid="updateAllColumnEntity" />
+		<include refid="whereParam" />
+	</update>
+
+	<update id="updateByMap">
+		UPDATE @tableName@ <include refid="update_column_entity" />
+		<include refid="whereParam" />
+	</update>
+
+	<update id="updateAllColumnByMap">
+		UPDATE @tableName@ <include refid="updateAllColumnEntity" />
+		<include refid="whereParam" />
+	</update>
+
+	<delete id="deleteById" parameterType="@pkJavaType@">
+		DELETE FROM @tableName@  @ById@
+	</delete>
+	<delete id="deleteByIds" parameterType="collection">
+		DELETE FROM @tableName@  WHERE id IN
+		<foreach collection="collection" item="ids" open="("
+			separator="," close=")">
+          <![CDATA[#{ids}]]>
+		</foreach>
+	</delete>
+	<delete id="delete" parameterType="@reqModeclasspath@">
+		DELETE FROM  @tableName@
+		<include refid="where" />
+	</delete>
+	<delete id="deleteByMap" parameterType="map">
+		DELETE FROM @tableName@
+		<include refid="where" />
+	</delete>
+
+	<select id="selectById" resultType="@respModeclasspath@" parameterType="@pkJavaType@">
+		SELECT
+		<include refid="selectAllColumn" />
+		FROM  @tableName@
+		@ById@
+	</select>
+	
+	<select id="selectOne" resultType="@respModeclasspath@" parameterType="@reqModeclasspath@">
+        SELECT
+        <include refid="selectAllColumn" />
+        FROM @tableName@
+        <include refid="where" />
+    </select>
+	
+	<select id="selectByIds" resultType="@respModeclasspath@" parameterType="collection">
+		SELECT <include refid="selectAllColumn" />
+		FROM @tableName@
+		WHERE id IN
+		<foreach collection="collection" item="ids" open="(" separator="," close=")">
+			<![CDATA[#{ids}]]>
+		</foreach>
+	</select>
+
+	<select id="selectList" resultType="@respModeclasspath@" parameterType="@reqModeclasspath@">
+		SELECT <include refid="selectAllColumn" />
+		FROM @tableName@
+		<include refid="where" />
+		${orderBy}
+	</select>
+
+	<select id="selectListByMap" resultType="@respModeclasspath@" parameterType="map">
+		SELECT <include refid="selectAllColumn" />
+		FROM @tableName@
+		<include refid="where" />
+	</select>
+
+    <select id="selectPage" resultType="@respModeclasspath@">
+        SELECT <include refid="selectAllColumn" />
+        FROM @tableName@
+        <include refid="whereParam" />
+        <if test="param != null">
+        	${param.orderBy}
+        </if>
+    </select>
+	
+</mapper>
