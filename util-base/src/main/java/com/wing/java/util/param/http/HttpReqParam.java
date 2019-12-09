@@ -9,6 +9,7 @@ import lombok.Data;
  * @author wing
  * @param <E>
  */
+@Deprecated
 @ApiModel(value = "REST请求参数封装")
 @Data
 public class HttpReqParam<E> extends ReqParam<E> {

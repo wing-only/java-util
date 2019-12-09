@@ -13,6 +13,10 @@ import java.util.Date;
 @Slf4j
 public class BaseController {
 
+    protected HttpRespParam success(String msg) {
+        return new HttpRespParam(1, msg);
+    }
+
     protected HttpRespParam success(Object data) {
         return new HttpRespParam(1, data);
     }
@@ -21,9 +25,22 @@ public class BaseController {
         return new HttpRespParam(0, data);
     }
 
+    protected HttpRespParam error(String msg) {
+        return new HttpRespParam(0, msg);
+    }
+
     protected HttpRespParam error(int code, Object data) {
         return new HttpRespParam(code, data);
     }
+
+    protected HttpRespParam error(int code, String msg) {
+        return new HttpRespParam(code, msg);
+    }
+
+    protected HttpRespParam error(int code, Object data, String msg) {
+        return new HttpRespParam(code, data, msg);
+    }
+
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
