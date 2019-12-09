@@ -1,12 +1,18 @@
 package com.wing.java.util;
 
 import com.wing.java.util.exception.BusinessException;
+import com.wing.java.util.exception.ExceptionConstant;
 import com.wing.java.util.param.http.HttpRespParam;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.errors.AuthorizationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -15,7 +21,8 @@ import java.util.Set;
 /**
  * controller层统一异常处理
  */
-@ControllerAdvice
+@RestControllerAdvice
+@Slf4j
 public class GlobalControllerExceptionHandler {
 
     /**
@@ -34,33 +41,29 @@ public class GlobalControllerExceptionHandler {
      */
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("author", "Magical Sam");
+        model.addAttribute("author", "wing");
     }
 
 
     @ExceptionHandler(Exception.class)
-    @ResponseBody
     public HttpRespParam handlerException(Exception e) {
         e.printStackTrace();
-        return new HttpRespParam(0, "请求失败");
+        return new HttpRespParam(0, ExceptionConstant.ERROR_MSG);
     }
 
     @ExceptionHandler(BusinessException.class)
-    @ResponseBody
     public HttpRespParam handlerException(BusinessException e) {
         e.printStackTrace();
         return new HttpRespParam(e.getCode() == -1 ? 0 : e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
     public HttpRespParam handlerException(MethodArgumentNotValidException e) {
         String defaultMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return new HttpRespParam(0, defaultMessage);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseBody
     public HttpRespParam handlerException(ConstraintViolationException e) {
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
 
@@ -71,18 +74,17 @@ public class GlobalControllerExceptionHandler {
         return new HttpRespParam(0);
     }
 
+    @ExceptionHandler(DuplicateKeyException.class)
+    public HttpRespParam handleDuplicateKeyException(DuplicateKeyException e) {
+        log.error(e.getMessage(), e);
+        return new HttpRespParam(0, "已存在该记录");
+    }
 
-//    @ExceptionHandler(DuplicateKeyException.class)
-//    public R handleDuplicateKeyException(DuplicateKeyException e){
-//        logger.error(e.getMessage(), e);
-//        return R.error("数据库中已存在该记录");
-//    }
-//
-//    @ExceptionHandler(AuthorizationException.class)
-//    public R handleAuthorizationException(AuthorizationException e){
-//        logger.error(e.getMessage(), e);
-//        return R.error("没有权限，请联系管理员授权");
-//    }
+    @ExceptionHandler(AuthorizationException.class)
+    public HttpRespParam handleAuthorizationException(AuthorizationException e) {
+        log.error(e.getMessage(), e);
+        return new HttpRespParam(0, "没有权限，请联系管理员授权");
+    }
 
 
 }

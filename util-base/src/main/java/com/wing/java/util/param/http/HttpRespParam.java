@@ -19,11 +19,24 @@ public class HttpRespParam<E> extends RespParam<E> {
 
     public HttpRespParam(int code) {
         this.code = code;
+        this.msg = "";
     }
 
     public HttpRespParam(int code, E data) {
         this.code = code;
+        this.msg = "";
         this.data = data;
+    }
+
+    public HttpRespParam(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
+    public HttpRespParam(int code, E data, String msg) {
+        this.code = code;
+        this.data = data;
+        this.msg = msg;
     }
 
 }

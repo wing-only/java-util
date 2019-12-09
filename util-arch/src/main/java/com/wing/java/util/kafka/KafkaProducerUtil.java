@@ -81,7 +81,7 @@ public class KafkaProducerUtil {
                 Long offsetIndex = r.getRecordMetadata().offset();
                 if (offsetIndex != null && offsetIndex >= 0) {
                     m.put("code", ExceptionConstant.SUCCESS);
-                    m.put("message", ExceptionConstant.SUCCESS_MESSAGE);
+                    m.put("message", ExceptionConstant.SUCCESS_MSG);
                     return m;
                 } else {
                     m.put("code", ExceptionConstant.KAFKA_NO_OFFSET_CODE);
