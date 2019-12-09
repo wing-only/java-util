@@ -9,8 +9,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Hashtable;
 
 public class QRCodeUtil {
@@ -125,9 +124,7 @@ public class QRCodeUtil {
         QRCodeUtil.encode(content, null, output, false);
     }
 
-    public static String decode(File file) throws Exception {
-        BufferedImage image;
-        image = ImageIO.read(file);
+    private static String getImgContent(BufferedImage image) throws IOException, NotFoundException {
         if (image == null) {
             return null;
         }
@@ -141,7 +138,22 @@ public class QRCodeUtil {
         return resultStr;
     }
 
-    public static String decode(String path) throws Exception {
-        return QRCodeUtil.decode(new File(path));
+    public static String decode(File file) throws Exception {
+        return getImgContent(ImageIO.read(file));
     }
+
+    private static String decode(InputStream is) throws Exception {
+        return getImgContent(ImageIO.read(is));
+    }
+
+    public static String decode(String imgPath) throws Exception {
+        return QRCodeUtil.decode(new File(imgPath));
+    }
+
+    public static String decode(byte[] imgByte) throws Exception {
+        InputStream is = new ByteArrayInputStream(imgByte);
+        return QRCodeUtil.decode(is);
+    }
+
+
 }

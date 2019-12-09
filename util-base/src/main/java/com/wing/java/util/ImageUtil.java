@@ -1,5 +1,7 @@
 package com.wing.java.util;
 
+import sun.misc.BASE64Decoder;
+
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -611,5 +613,4 @@ public class ImageUtil {
         // 6-给图片添加图片水印：
 //        ImageUtil.pressImage("e:/abc2.jpg", "e:/abc.jpg", "e:/abc_pressImage.jpg", 0, 0, 0.5f);
     }
-
 }

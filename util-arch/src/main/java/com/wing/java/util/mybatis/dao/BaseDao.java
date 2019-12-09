@@ -1,4 +1,4 @@
-package com.wing.java.util.mybatis.mapper;
+package com.wing.java.util.mybatis.dao;
 
 import com.wing.java.util.param.page.Page;
 import org.apache.ibatis.annotations.Param;
@@ -12,7 +12,7 @@ import java.util.Map;
  * @author wing
  * @create 2018-08-31 17:17
  */
-public interface BaseMapper<E, SE, WP> {
+public interface BaseDao<E, SE, WP> {
 
     /**
      * <p>

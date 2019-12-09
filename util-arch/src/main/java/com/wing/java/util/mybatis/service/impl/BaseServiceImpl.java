@@ -3,7 +3,7 @@ package com.wing.java.util.mybatis.service.impl;
 import com.wing.java.util.CommonUtil;
 import com.wing.java.util.exception.BusinessException;
 import com.wing.java.util.id.IdUtil;
-import com.wing.java.util.mybatis.mapper.BaseMapper;
+import com.wing.java.util.mybatis.dao.BaseDao;
 import com.wing.java.util.mybatis.service.IBaseService;
 import com.wing.java.util.param.page.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ import java.util.Map;
  * @author wing
  * @create 2018-08-31 17:23
  */
-public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> implements IBaseService<E, SE, WP> {
+public class BaseServiceImpl<M extends BaseDao<E, SE, WP>, E, SE, WP> implements IBaseService<E, SE, WP> {
 
     @Autowired
-    protected M baseMapper;
+    protected M baseDao;
 
 
 
@@ -66,7 +66,7 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
     @Override
     public E insert(E entity) {
         setId(entity);
-        Integer insert = baseMapper.insert(entity);
+        Integer insert = baseDao.insert(entity);
         if(ge1(insert)){
             return entity;
         }
@@ -76,7 +76,7 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
     @Override
     public E insertAllColumn(E entity) {
         setId(entity);
-        Integer insert = baseMapper.insertAllColumn(entity);
+        Integer insert = baseDao.insertAllColumn(entity);
         if(ge1(insert)){
             return entity;
         }
@@ -112,7 +112,7 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
         if(CommonUtil.isEmpty(id)){
             throw new BusinessException("id不能为空");
         }
-        return ge1(baseMapper.deleteById(id));
+        return ge1(baseDao.deleteById(id));
     }
 
     @Override
@@ -120,12 +120,12 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
         if(CommonUtil.isEmpty(ids)){
             throw new BusinessException("ids不能为空");
         }
-        return ge1(baseMapper.deleteByIds(ids));
+        return ge1(baseDao.deleteByIds(ids));
     }
 
     @Override
     public boolean delete(WP whereParam) {
-        return ge0(baseMapper.delete(whereParam));
+        return ge0(baseDao.delete(whereParam));
     }
 
     @Override
@@ -133,22 +133,22 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
         if(CommonUtil.isEmpty(whereMap)){
             throw new BusinessException("查询条件不能为空");
         }
-        return ge0(baseMapper.deleteByMap(whereMap));
+        return ge0(baseDao.deleteByMap(whereMap));
     }
 
     @Override
     public boolean updateById(E entity) {
-        return ge1(baseMapper.updateById(entity));
+        return ge1(baseDao.updateById(entity));
     }
 
     @Override
     public boolean updateAllColumnById(E entity) {
-        return ge1(baseMapper.updateAllColumnById(entity));
+        return ge1(baseDao.updateAllColumnById(entity));
     }
 
     @Override
     public boolean update(E entity, WP whereParam) {
-        return ge0(baseMapper.update(entity, whereParam));
+        return ge0(baseDao.update(entity, whereParam));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
         if(CommonUtil.isEmpty(whereMap)){
             throw new BusinessException("查询条件不能为空");
         }
-        return ge0(baseMapper.updateByMap(entity, whereMap));
+        return ge0(baseDao.updateByMap(entity, whereMap));
     }
 
 //    @Override
@@ -184,12 +184,12 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
         if(CommonUtil.isEmpty(id)){
             throw new BusinessException("ID不能为空");
         }
-        return baseMapper.selectById(id);
+        return baseDao.selectById(id);
     }
 
     @Override
     public SE selectOne(WP whereParam) {
-        return baseMapper.selectOne(whereParam);
+        return baseDao.selectOne(whereParam);
     }
 
     @Override
@@ -197,28 +197,28 @@ public class BaseServiceImpl<M extends BaseMapper<E, SE, WP>, E, SE, WP> impleme
         if(CommonUtil.isEmpty(ids)){
             throw new BusinessException("ids不能为空");
         }
-        return baseMapper.selectByIds(ids);
+        return baseDao.selectByIds(ids);
     }
 
     @Override
     public List<SE> selectList(WP whereParam) {
-        return baseMapper.selectList(whereParam);
+        return baseDao.selectList(whereParam);
     }
 
     @Override
     public List<SE> selectListByMap(Map<String, Object> whereMap) {
-        return baseMapper.selectListByMap(whereMap);
+        return baseDao.selectListByMap(whereMap);
     }
 
     @Override
     public Page<SE, WP> selectPage(Page<SE, WP> page) {
-        List<SE> list = baseMapper.selectPage(page);
+        List<SE> list = baseDao.selectPage(page);
         page.setDataList(list);
         return page;
     }
 
 //    @Override
 //    public PageResp<Map<String, Object>> selectPageMap(PageReq<WP> whereParam) {
-//        return baseMapper.selectPageMap(whereParam);
+//        return baseDao.selectPageMap(whereParam);
 //    }
 }
