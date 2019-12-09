@@ -2,6 +2,7 @@ package com.wing.java.util;
 
 import com.wing.java.util.exception.BusinessException;
 import com.wing.java.util.param.http.HttpRespParam;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
@@ -69,4 +70,19 @@ public class GlobalControllerExceptionHandler {
         }
         return new HttpRespParam(0);
     }
+
+
+//    @ExceptionHandler(DuplicateKeyException.class)
+//    public R handleDuplicateKeyException(DuplicateKeyException e){
+//        logger.error(e.getMessage(), e);
+//        return R.error("数据库中已存在该记录");
+//    }
+//
+//    @ExceptionHandler(AuthorizationException.class)
+//    public R handleAuthorizationException(AuthorizationException e){
+//        logger.error(e.getMessage(), e);
+//        return R.error("没有权限，请联系管理员授权");
+//    }
+
+
 }
