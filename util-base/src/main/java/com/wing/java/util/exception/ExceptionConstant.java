@@ -29,9 +29,9 @@ public interface ExceptionConstant {
     int SC_USE_PROXY = 305;
     int SC_TEMPORARY_REDIRECT = 307;
     int SC_BAD_REQUEST = 400;
-    int SC_UNAUTHORIZED = 401;
+    int SC_UNAUTHORIZED = 401;  //身份认证失败
     int SC_PAYMENT_REQUIRED = 402;
-    int SC_FORBIDDEN = 403;
+    int SC_FORBIDDEN = 403;     //权限不足
     int SC_NOT_FOUND = 404;
     int SC_METHOD_NOT_ALLOWED = 405;
     int SC_NOT_ACCEPTABLE = 406;
