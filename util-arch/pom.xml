@@ -3,21 +3,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <url>https://github.com/wing-only</url>
     <artifactId>util-arch</artifactId>
 
     <parent>
-        <groupId>com.github.wing-only</groupId>
+        <groupId>com.wing.java</groupId>
         <artifactId>java-util</artifactId>
-        <version>2.1.7.RELEASE</version>
+        <version>2.1.7</version>
     </parent>
 
     <dependencies>
         <!--基础工具类-->
         <dependency>
-            <groupId>com.github.wing-only</groupId>
+            <groupId>com.wing.java</groupId>
             <artifactId>util-base</artifactId>
-            <version>2.1.7.RELEASE</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <!--spring boot-->
         <dependency>
@@ -59,7 +58,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>

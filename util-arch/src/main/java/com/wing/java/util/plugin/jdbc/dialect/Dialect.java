@@ -1,6 +1,7 @@
 package com.wing.java.util.plugin.jdbc.dialect;
 /**
- * 数据库方言
+ * 类似hibernate的Dialect,但只精简出分页部分
+ * @author badqiu
  */
 public class Dialect {
 	
@@ -16,8 +17,8 @@ public class Dialect {
      * 将sql变成分页sql语句,直接使用offset,limit的值作为占位符.</br>
      * 源代码为: getLimitString(sql,offset,String.valueOf(offset),limit,String.valueOf(limit))
      */
-    public String getLimitString(String sql, long offset, int limit) {
-    	return getLimitString(sql, offset, Long.toString(offset), limit, Integer.toString(limit));
+    public String getLimitString(String sql, int offset, int limit) {
+    	return getLimitString(sql,offset,Integer.toString(offset),limit,Integer.toString(limit));
     }
     
     /**
@@ -29,8 +30,8 @@ public class Dialect {
      * </pre>
      * @return 包含占位符的分页sql
      */
-    public String getLimitString(String sql, long offset, String offsetPlaceholder, int limit, String limitPlaceholder) {
-    	throw new UnsupportedOperationException("page query not supported");
+    public String getLimitString(String sql, int offset,String offsetPlaceholder, int limit,String limitPlaceholder) {
+    	throw new UnsupportedOperationException("paged queries not supported");
     }
     
 }

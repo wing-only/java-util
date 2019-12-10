@@ -31,7 +31,7 @@ public class FreemarkerUtil {
             return templateStr;
         }
 
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
         cfg.setTagSyntax(Configuration.AUTO_DETECT_TAG_SYNTAX);
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);

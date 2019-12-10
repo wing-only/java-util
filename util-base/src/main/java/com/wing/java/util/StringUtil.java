@@ -2,7 +2,7 @@ package com.wing.java.util;
 
 /**
  * @author wing
- * @create 2019-08-10 17:46
+ * @create 2017-08-10 17:46
  */
 public class StringUtil {
 
