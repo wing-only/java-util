@@ -1,7 +1,7 @@
 package @IServicePackage@;
 
-import com.wing.msa.common.service.IBaseService;
-import com.wing.msa.common.param.page.Page;
+import com.wing.java.util.mybatis.service.IBaseService;
+import com.wing.java.util.param.page.Page;
 import java.io.Serializable;
 import java.util.List;
 import @modelPackage@.@ModelName@;

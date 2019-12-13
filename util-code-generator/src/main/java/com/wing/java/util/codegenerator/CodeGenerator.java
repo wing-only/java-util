@@ -10,7 +10,7 @@ import org.apache.maven.project.MavenProject;
 import java.io.*;
 import java.util.Properties;
 
-import static com.wing.java.util.codegenerator.CommonUtil.initcap;
+import static com.wing.java.util.codegenerator.InnerUtil.initcap;
 
 @Mojo(name = "generate")
 public class CodeGenerator extends AbstractMojo {
@@ -45,10 +45,10 @@ public class CodeGenerator extends AbstractMojo {
         codeUtil.controllerPackage = properties.getProperty("controllerPackage");
         codeUtil.modelPackage = properties.getProperty("entityPackage");
         codeUtil.voPackage = properties.getProperty("voPackage");
+        codeUtil.daoPackage = properties.getProperty("daoPackage");
         codeUtil.mapperPackage = properties.getProperty("mapperPackage");
-        codeUtil.mappingPackage = properties.getProperty("mappingPackage");
         codeUtil.iservicePackage = properties.getProperty("iservicePackage");
-        codeUtil.iserviceImplPackage = properties.getProperty("serviceImplPackage");
+        codeUtil.serviceImplPackage = properties.getProperty("serviceImplPackage");
         codeUtil.dubboConfig = properties.getProperty("dubboConfig");
 
         codeUtil.driver = properties.getProperty("driver");

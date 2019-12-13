@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class CommonUtil {
+public class InnerUtil {
 	
 	/**
 	 * 功能：将输入字符串的首字母改成大写

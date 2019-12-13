@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wing.java.util.codegenerator.CommonUtil.*;
+import static com.wing.java.util.codegenerator.InnerUtil.*;
 
 @SuppressWarnings("all")
 public class CodeUtil {
@@ -23,12 +23,12 @@ public class CodeUtil {
 
 	//代码生成位置，包路径
 	String controllerPackage;
-	String modelPackage;
-	String mapperPackage;
-	String mappingPackage;
-	String voPackage;
 	String iservicePackage;
-	String iserviceImplPackage;
+	String serviceImplPackage;
+	String daoPackage;
+	String mapperPackage;
+	String modelPackage;
+	String voPackage;
 	String dubboConfig;
 	
 	//代码输出基本路径
@@ -48,34 +48,36 @@ public class CodeUtil {
 
 	// controller模板文件
 	String ControllerTemplateFile = "ControllerTemplate.java";
-    // mapping模板文件
-	String MappingTemplateFile = "MappingTemplate.xml";
-    // mapper模板文件
-	String MapperTemplateFile = "MapperTemplate.java";
+	//service模板
+	String iserviceTemplateFile = "IServceTemplate.java";
+	//serviceImpl模板
+	String serviceImplTemplateFile = "ServiecImplTemplate.java";
+    // dao模板文件
+	String DaoTemplateFile = "DaoTemplate.java";
+	// mapper模板文件
+	String MapperTemplateFile = "MapperTemplate.xml";
 	// model模板文件
 	String ModelTemplateFile = "ModelTemplate.java";
 	// req模板文件  时间条件
 	String QryReqVoTemplateFile = "QryReqVoTemplate.java";
 	// resp模板文件  枚举
 	String QryRespVoTemplateFile = "QryRespVoTemplate.java";
-	//service模板
-	String iserviceTemplateFile = "IServceTemplate.java";
-	//serviceImpl模板
-	String serviceImplTemplateFile = "ServiecImplTemplate.java";
+
 	//dubbo模板
 	String dubboConfigFile = "dubbo.txt";
 	
 	//临时变量
     String controllerTemplate = "";
+	String IserviceTemplate = "";
+	String serviceImplTemplate = "";
+	String daoTemplate = "";
 	String modelTemplate = "";
-    String mapperTemplate = "";
 	String tableComment="";
 	String entityName = "";
 	String mappingTemplate="";
 	String reqvoTemplate="";
 	String respvoTemplate="";
-	String IserviceTemplate = "";
-	String serviceImplTemplate = "";
+
 	String dubboConfigTemplate = "";
 
 	//数据库字段类型与Java类型映射
@@ -99,16 +101,16 @@ public class CodeUtil {
 		try {
 			init();
 			readTableInfo();
-			// 
-			getModel();
-			getVo();
-			getMapper();
-			getMapping();
+			//
 			getController();
 			getService();
 			getServiceImpl();
+			getDao();
+			getMapping();
+			getModel();
+			getVo();
 			getDubboConfig();
-			// 
+			// 写文件
 			writeFile();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -116,8 +118,151 @@ public class CodeUtil {
 	}
 
 	/**
-	 * 从数据读取表结构信息
+	 * 初始化
+	 * 1、表字段类型与Java类型映射
+	 * 2、加载controlle、mapper目标
 	 * @throws Exception
+	 */
+	void init() throws Exception {
+
+		sql2jdbctypes.put("BIGINT", "BIGINT");
+		sql2jdbctypes.put("CHAR", "CHAR");
+		sql2jdbctypes.put("DATE", "DATE");
+		sql2jdbctypes.put("DATETIME", "TIMESTAMP");
+		sql2jdbctypes.put("TIMESTAMP", "TIMESTAMP");
+		sql2jdbctypes.put("DECIMAL", "DECIMAL");
+		sql2jdbctypes.put("DOUBLE", "DOUBLE");
+		sql2jdbctypes.put("ENUM", "CHAR");
+		sql2jdbctypes.put("FLOAT", "REAL");
+		sql2jdbctypes.put("INT", "INTEGER");
+		sql2jdbctypes.put("TINYINT", "TINYINT");
+		sql2jdbctypes.put("TEXT", "LONGVARCHAR");
+		sql2jdbctypes.put("TIME", "TIME");
+		sql2jdbctypes.put("VARCHAR", "VARCHAR");
+		sql2jdbctypes.put("YEAR", "DATE");
+
+		jdbc2javatypes.put("CHAR", "String");
+		jdbc2javatypes.put("VARCHAR", "String");
+		jdbc2javatypes.put("BIGINT", "Long");
+		jdbc2javatypes.put("TINYINT", "Byte");
+		jdbc2javatypes.put("DATE", "Date");
+		jdbc2javatypes.put("DOUBLE", "Double");
+		jdbc2javatypes.put("INTEGER", "Integer");
+		jdbc2javatypes.put("TIMESTAMP", "Date");
+		jdbc2javatypes.put("DECIMAL", "BigDecimal");
+		jdbc2javatypes.put("ENUM", "String");
+		jdbc2javatypes.put("FLOAT", "Float");
+		jdbc2javatypes.put("LONGVARCHAR", "String");
+		jdbc2javatypes.put("BLOB", "byte[]");
+		jdbc2javatypes.put("LONGBLOB", "byte[]");
+		jdbc2javatypes.put("LONGVARBINARY", "byte[]");
+		jdbc2javatypes.put("VARBINARY", "byte[]");
+
+		javatypesfullname.put("String", "java.lang.String");
+		javatypesfullname.put("Integer", "java.lang.Integer");
+		javatypesfullname.put("Long", "java.lang.Long");
+		javatypesfullname.put("Double", "java.lang.Double");
+		javatypesfullname.put("Float", "java.lang.Float");
+
+		datetypes.add("DATE");
+		datetypes.add("DATETIME");
+		datetypes.add("TIMESTAMP");
+
+		StringBuilder sb =null;
+
+		sb = new StringBuilder("");
+		BufferedReader bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(ControllerTemplateFile)));
+		String line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		controllerTemplate = sb.toString();
+		bReader.close();
+
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(MapperTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		mappingTemplate = sb.toString();
+		bReader.close();
+
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(DaoTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		daoTemplate = sb.toString();
+		bReader.close();
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(ModelTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		modelTemplate = sb.toString();
+		bReader.close();
+
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(QryReqVoTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		reqvoTemplate = sb.toString();
+		bReader.close();
+
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(QryRespVoTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		respvoTemplate = sb.toString();
+		bReader.close();
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(serviceImplTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		serviceImplTemplate = sb.toString();
+		bReader.close();
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(iserviceTemplateFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		IserviceTemplate = sb.toString();
+		bReader.close();
+
+		sb = new StringBuilder("");
+		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(dubboConfigFile)));
+		line = null;
+		while ((line = bReader.readLine()) != null) {
+			sb.append(line).append(enter);
+		}
+		dubboConfigTemplate = sb.toString();
+		bReader.close();
+
+		File file = new File(baseOutputPath);
+		if(!file.exists()) {
+			file.mkdirs();
+		}
+	}
+
+	/**
+	 * 从数据读取表结构信息
 	 */
 	private void readTableInfo() throws Exception {
 		String sql = "SELECT lower(column_name) column_name,UPPER(data_type) data_type,column_comment,column_key,is_nullable ,character_maximum_length  ,(SELECT table_comment FROM information_schema.TABLES WHERE table_schema = '%s' AND table_name = '%s') table_comment FROM information_schema.columns WHERE table_schema = '%s' AND table_name = '%s'" ;
@@ -201,7 +346,6 @@ public class CodeUtil {
 			}
 		}
 		checkEntityslist();
-		
 	}
 
 	/**
@@ -217,11 +361,11 @@ public class CodeUtil {
 		pw.write(modelTemplate);
 		pw.flush();
 		
-		pw = new PrintWriter(createFile((baseOutputPath + mapperPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Mapper.java"), "utf-8");
-		pw.write(mapperTemplate);
+		pw = new PrintWriter(createFile((baseOutputPath + daoPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Dao.java"), "utf-8");
+		pw.write(daoTemplate);
 		pw.flush();
 		
-		pw = new PrintWriter(createFile((baseOutputPath + mappingPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "Mapper.xml"), "utf-8");
+		pw = new PrintWriter(createFile((baseOutputPath + mapperPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "Dao.xml"), "utf-8");
 		pw.write(mappingTemplate);
 		pw.flush();
 		pw = new PrintWriter(createFile((baseOutputPath + controllerPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Controller.java"), "utf-8");
@@ -237,7 +381,7 @@ public class CodeUtil {
 		pw = new PrintWriter(createFile((baseOutputPath + iservicePackage + ".").replaceAll("\\.", "\\\\")+"I"+ this.entityName + "Service.java"), "utf-8");
 		pw.write(IserviceTemplate);
 		pw.flush();
-		pw = new PrintWriter(createFile((baseOutputPath + iserviceImplPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "ServiceImpl.java"), "utf-8");
+		pw = new PrintWriter(createFile((baseOutputPath + serviceImplPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "ServiceImpl.java"), "utf-8");
 		pw.write(serviceImplTemplate);
 		pw.flush();
 		pw.close();
@@ -248,12 +392,12 @@ public class CodeUtil {
 		pw.close();
 	}
 
-	private void getMapper() {
+	private void getDao() {
 		
-		mapperTemplate = mapperTemplate.replaceAll("@mapperPackage@", mapperPackage);
-		mapperTemplate = mapperTemplate.replaceAll("@modelPackage@", modelPackage);
-		mapperTemplate = mapperTemplate.replaceAll("@entityName@", entityName);
-		mapperTemplate = mapperTemplate.replaceAll("@voPackage@", voPackage);
+		daoTemplate = daoTemplate.replaceAll("@daoPackage@", daoPackage);
+		daoTemplate = daoTemplate.replaceAll("@modelPackage@", modelPackage);
+		daoTemplate = daoTemplate.replaceAll("@entityName@", entityName);
+		daoTemplate = daoTemplate.replaceAll("@voPackage@", voPackage);
 		
 	}
 
@@ -290,7 +434,7 @@ public class CodeUtil {
     			sb.append("\t/**\r\n");
     			sb.append("\t* ").append(entitys.getComment()).append("\r\n");
     			sb.append("\t*/ \r\n");
-    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\\\"\"+entitys.getComment()+\"\\\", required="+ !entitys.isIsnullable()   +") \r\n");
+    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isIsnullable()   +") \r\n");
     			sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
     		}
     	}
@@ -308,7 +452,7 @@ public class CodeUtil {
     			sb.append("\t/**\r\n");
     			sb.append("\t* ").append(entitys.getComment()).append("\r\n");
     			sb.append("\t*/ \r\n");
-    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\\\"\"+entitys.getComment()+\"\\\", required="+ !entitys.isIsnullable()   +") \r\n");
+    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isIsnullable()   +") \r\n");
     			sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
     		}
     	}
@@ -332,9 +476,9 @@ public class CodeUtil {
 	    serviceImplTemplate = serviceImplTemplate.replaceAll("@ModelName@", entityName);
 	    serviceImplTemplate = serviceImplTemplate.replaceAll("@modelPackage@", modelPackage);
 	    serviceImplTemplate = serviceImplTemplate.replaceAll("@voPackage@", voPackage);
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@mapperPackage@", mapperPackage);
+	    serviceImplTemplate = serviceImplTemplate.replaceAll("@daoPackage@", daoPackage);
 //	    serviceImplTemplate = serviceImplTemplate.replaceAll("@pkType@", pk.getFieldType());
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@ServiceImplPackage@", iserviceImplPackage);
+	    serviceImplTemplate = serviceImplTemplate.replaceAll("@ServiceImplPackage@", serviceImplPackage);
 	    serviceImplTemplate = serviceImplTemplate.replaceAll("@modelName@", modelName);
 	    serviceImplTemplate = serviceImplTemplate.replaceAll("@variableName@", toLowerCaseFirstOne(modelName));
 	    serviceImplTemplate= serviceImplTemplate.replaceAll("@IServicePackage@", iservicePackage);
@@ -342,7 +486,7 @@ public class CodeUtil {
 	
 	private void getDubboConfig() {
 		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@ModelName@", entityName);
-		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@ServiceImplPackage@", iserviceImplPackage);
+		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@ServiceImplPackage@", serviceImplPackage);
 		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@variableName@", toLowerCaseFirstOne(modelName));
 		dubboConfigTemplate= dubboConfigTemplate.replaceAll("@IServicePackage@", iservicePackage);
 	}
@@ -398,7 +542,7 @@ public class CodeUtil {
 
 		
 		String entityClasspath = modelPackage.concat(".").concat(this.entityName);
-		String modeclasspath = mapperPackage.concat(".").concat(this.entityName).concat("Mapper");
+		String modeclasspath = daoPackage.concat(".").concat(this.entityName).concat("Dao");
 		String reqModeclasspath = voPackage.concat(".").concat(this.entityName).concat("QryReqVo");
 		String respModeclasspath = voPackage.concat(".").concat(this.entityName).concat("QryRespVo");
 		StringBuilder columns = new StringBuilder();
@@ -639,17 +783,17 @@ public class CodeUtil {
             sb.append("\t*/ \r\n");
             
             if (entitys.isPk) {
-            	sb.append("\t@Null(message =\"ID必须为空\",groups={add.class}) \r\n");
-            	sb.append("\t@NotNull(message =\"ID不能为空\",groups={update.class}) \r\n");
+            	sb.append("\t@Null(message =\"ID必须为空\",groups={AddGroup.class}) \r\n");
+            	sb.append("\t@NotNull(message =\"ID不能为空\",groups={UpdateGroup.class}) \r\n");
             }else if (!entitys.isnullable && !"ctime".equalsIgnoreCase(entitys.getFieldName()) && !"cdate".equalsIgnoreCase(entitys.getFieldName())  && !"version".equalsIgnoreCase(entitys.getFieldName())) {
-            	sb.append("\t@NotNull(message =\""+entitys.getComment()+"不能为空"+"\",groups=add.class) \r\n");
+            	sb.append("\t@NotNull(message =\""+entitys.getComment()+"不能为空"+"\",groups=AddGroup.class) \r\n");
             	 if (entitys.getFieldType().equalsIgnoreCase("string")) {
-            		 sb.append("\t@NotEmpty(message =\""+entitys.getComment()+"不能为空"+"\",groups=add.class) \r\n");
+            		 sb.append("\t@NotEmpty(message =\""+entitys.getComment()+"不能为空"+"\",groups=AddGroup.class) \r\n");
             	 }
             }
             
             if(entitys.getMaxlength()!=null){
-                sb.append("\t@Size(max="+entitys.getMaxlength()+" ,message =\""+entitys.getComment()+"最多"+entitys.getMaxlength()+"个字符\",groups=add.class) \r\n");
+                sb.append("\t@Size(max="+entitys.getMaxlength()+" ,message =\""+entitys.getComment()+"最多"+entitys.getMaxlength()+"个字符\",groups=AddGroup.class) \r\n");
             }
             sb.append("\t@ApiModelProperty(value=\""+entitys.getComment()+"\",name=\""+entitys.getFieldName()+"\",required="+ !entitys.isIsnullable()   +") \r\n");
             if("time".equalsIgnoreCase(entitys.getDataType())){//数据库类型为time时，需要单独转换一下
@@ -711,152 +855,7 @@ public class CodeUtil {
 		return jdbc2javatypes.get(dataType);
 	}
 
-	/**
-	 * 初始化
-	 * 1、表字段类型与Java类型映射
-	 * 2、加载controlle、mapper目标
-	 * @throws Exception
-	 */
-	void init() throws Exception {
-	    
-	    sql2jdbctypes.put("BIGINT", "BIGINT");
-	    sql2jdbctypes.put("CHAR", "CHAR");
-	    sql2jdbctypes.put("DATE", "DATE");
-	    sql2jdbctypes.put("DATETIME", "TIMESTAMP");
-	    sql2jdbctypes.put("TIMESTAMP", "TIMESTAMP");
-	    sql2jdbctypes.put("DECIMAL", "DECIMAL");
-	    sql2jdbctypes.put("DOUBLE", "DOUBLE");
-	    sql2jdbctypes.put("ENUM", "CHAR");
-	    sql2jdbctypes.put("FLOAT", "REAL");
-	    sql2jdbctypes.put("INT", "INTEGER");
-	    sql2jdbctypes.put("TINYINT", "TINYINT");
-	    sql2jdbctypes.put("TEXT", "LONGVARCHAR");
-	    sql2jdbctypes.put("TIME", "TIME");
-	    sql2jdbctypes.put("VARCHAR", "VARCHAR");
-	    sql2jdbctypes.put("YEAR", "DATE");
-	    
-	    
-	    jdbc2javatypes.put("CHAR", "String");
-	    jdbc2javatypes.put("VARCHAR", "String");
-	    jdbc2javatypes.put("BIGINT", "Long");
-	    jdbc2javatypes.put("TINYINT", "Byte");
-	    jdbc2javatypes.put("DATE", "Date");
-	    jdbc2javatypes.put("DOUBLE", "Double");
-	    jdbc2javatypes.put("INTEGER", "Integer");
-	    jdbc2javatypes.put("TIMESTAMP", "Date");
-	    jdbc2javatypes.put("DECIMAL", "BigDecimal");
-	    jdbc2javatypes.put("ENUM", "String");
-	    jdbc2javatypes.put("FLOAT", "Float");
-	    jdbc2javatypes.put("LONGVARCHAR", "String");
-	    jdbc2javatypes.put("BLOB", "byte[]");
-	    jdbc2javatypes.put("LONGBLOB", "byte[]");
-	    jdbc2javatypes.put("LONGVARBINARY", "byte[]");
-	    jdbc2javatypes.put("VARBINARY", "byte[]");
-	    
-	    javatypesfullname.put("String", "java.lang.String");
-	    javatypesfullname.put("Integer", "java.lang.Integer");
-	    javatypesfullname.put("Long", "java.lang.Long");
-	    javatypesfullname.put("Double", "java.lang.Double");
-	    javatypesfullname.put("Float", "java.lang.Float");
-	    
-		datetypes.add("DATE");
-		datetypes.add("DATETIME");
-		datetypes.add("TIMESTAMP");
-		
-		
-		
-		StringBuilder sb =null;
 
-		sb = new StringBuilder("");
-		BufferedReader bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(ControllerTemplateFile)));
-		String line = null;
-		while ((line = bReader.readLine()) != null) {
-			sb.append(line).append(enter);
-		}
-		controllerTemplate = sb.toString();
-		bReader.close();
-		
-		
-		sb = new StringBuilder("");
-		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(MappingTemplateFile)));
-		line = null;
-		while ((line = bReader.readLine()) != null) {
-			sb.append(line).append(enter);
-		}
-		mappingTemplate = sb.toString();
-		bReader.close();
-		
-		
-		sb = new StringBuilder("");
-		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(MapperTemplateFile)));
-		line = null;
-		while ((line = bReader.readLine()) != null) {
-			sb.append(line).append(enter);
-		}
-		mapperTemplate = sb.toString();
-		bReader.close();
-		
-		sb = new StringBuilder("");
-		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(ModelTemplateFile)));
-		line = null;
-		while ((line = bReader.readLine()) != null) {
-			sb.append(line).append(enter);
-		}
-		modelTemplate = sb.toString();
-		bReader.close();
-		
-		
-		sb = new StringBuilder("");
-		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(QryReqVoTemplateFile)));
-		line = null;
-		while ((line = bReader.readLine()) != null) {
-			sb.append(line).append(enter);
-		}
-		reqvoTemplate = sb.toString();
-		bReader.close();
-		
-		
-		sb = new StringBuilder("");
-		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(QryRespVoTemplateFile)));
-		line = null;
-		while ((line = bReader.readLine()) != null) {
-			sb.append(line).append(enter);
-		}
-		respvoTemplate = sb.toString();
-		bReader.close();
-		
-		sb = new StringBuilder("");
-		bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(serviceImplTemplateFile)));
-        line = null;
-        while ((line = bReader.readLine()) != null) {
-            sb.append(line).append(enter);
-        }
-        serviceImplTemplate = sb.toString();
-        bReader.close();
-        
-        sb = new StringBuilder("");
-        bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(iserviceTemplateFile)));
-        line = null;
-        while ((line = bReader.readLine()) != null) {
-            sb.append(line).append(enter);
-        }
-        IserviceTemplate = sb.toString();
-        bReader.close();
-        
-        sb = new StringBuilder("");
-        bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(dubboConfigFile)));
-        line = null;
-        while ((line = bReader.readLine()) != null) {
-        	sb.append(line).append(enter);
-        }
-        dubboConfigTemplate = sb.toString();
-        bReader.close();
-		
-		File file = new File(baseOutputPath);
-		if(!file.exists()) {
-		    file.mkdirs();
-		}
-	}
 
 	private void checkEntityslist() {
 	    for (Entitys entitys : entityslist) {

@@ -16,5 +16,6 @@ public class @modelName@QryReqVo extends @modelName@ {
 	 * 排序
 	 */
 	@ApiModelProperty(hidden = true, name="orderBy",value="排序",required=false)
-	private String orderBy = " order by id desc ";
+//	private String orderBy = " order by id desc ";
+	private String orderBy = "";
 }
