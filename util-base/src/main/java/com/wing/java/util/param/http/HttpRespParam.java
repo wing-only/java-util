@@ -3,6 +3,7 @@ package com.wing.java.util.param.http;
 import com.wing.java.util.param.RespParam;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
  */
 @ApiModel(value = "REST返回数据封装")
 @Data
+@NoArgsConstructor
 public class HttpRespParam<E> extends RespParam<E> {
 
 //    public HttpRespParam() {

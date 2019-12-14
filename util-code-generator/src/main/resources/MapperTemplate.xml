@@ -70,7 +70,7 @@
 		@ById@
 	</update>
 	<update id="update">
-		UPDATE @tableName@ <include refid="update_column_entity" />
+		UPDATE @tableName@ <include refid="updateColumnEntity" />
 		<include refid="whereParam" />
 	</update>
 
@@ -80,7 +80,7 @@
 	</update>
 
 	<update id="updateByMap">
-		UPDATE @tableName@ <include refid="update_column_entity" />
+		UPDATE @tableName@ <include refid="updateColumnEntity" />
 		<include refid="whereParam" />
 	</update>
 
