@@ -271,4 +271,14 @@ public class DateUtil {
 		int seconds = date.getSeconds();
 		return hours * 60 * 60 + minutes * 60 + seconds;
 	}
+
+	/**
+	 * 获取两个日期之间相差的秒数
+	 * @param largeDate
+	 * @param smallDate
+	 * @return
+	 */
+	public static long getSecondBetweenTwoDate(Date largeDate, Date smallDate){
+		return (largeDate.getTime() - smallDate.getTime()) / 1000;
+	}
 }
