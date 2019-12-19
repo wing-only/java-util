@@ -50,18 +50,21 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(Exception.class)
     public HttpRespParam handlerException(Exception e) {
         e.printStackTrace();
+        log.error(e.getMessage());
         return new HttpRespParam(0, new HashMap(), ExceptionConstant.ERROR_MSG);
     }
 
     @ExceptionHandler(BusinessException.class)
     public HttpRespParam handlerException(BusinessException e) {
         e.printStackTrace();
+        log.error(e.getMessage());
         return new HttpRespParam(e.getCode() == -1 ? 0 : e.getCode(), new HashMap(), e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public HttpRespParam handlerException(MethodArgumentNotValidException e) {
         String defaultMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error(defaultMessage);
         return new HttpRespParam(0, new HashMap(), defaultMessage);
     }
 
@@ -71,8 +74,10 @@ public class GlobalControllerExceptionHandler {
 
         for (ConstraintViolation<?> constraintViolation : constraintViolations) {
             System.out.println(constraintViolation.getMessage());
+            log.error(constraintViolation.getMessage());
             return new HttpRespParam(0, new HashMap(), constraintViolation.getMessage());
         }
+        log.error(e.getMessage());
         return new HttpRespParam(0, new HashMap(), "error");
     }
 

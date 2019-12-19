@@ -260,5 +260,15 @@ public class DateUtil {
 		return al;
 	}
 
-
+	/**
+	 * 获取当前时间距离当天0点的秒数
+	 * @param date
+	 * @return
+	 */
+	public static int getSecondBetweenZero(Date date) {
+		int hours = date.getHours();
+		int minutes = date.getMinutes();
+		int seconds = date.getSeconds();
+		return hours * 60 * 60 + minutes * 60 + seconds;
+	}
 }
