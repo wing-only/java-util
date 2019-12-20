@@ -286,7 +286,7 @@ public class CodeUtil {
 			en.setDataType(data_type);
 			en.setComment(column_comment);
 			if(character_maximum_length!=null && !"longblob".equalsIgnoreCase(data_type)){
-				en.setMaxlength( Integer.parseInt(character_maximum_length) );
+				en.setMaxlength(Long.parseLong(character_maximum_length));
 			}
 			if ( column_key.contains("PRI")) {
 				en.setPk(true);

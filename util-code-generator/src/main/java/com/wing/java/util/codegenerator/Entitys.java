@@ -10,7 +10,7 @@ public class Entitys {
     boolean isnullable = true;
     boolean isPk = false;
     boolean isadd = false;
-    Integer maxlength;
+    Long maxlength;
 
     public String getOrgcolumnName() {
         return orgcolumnName;
@@ -28,11 +28,11 @@ public class Entitys {
         this.isadd = isadd;
     }
 
-    public Integer getMaxlength() {
+    public Long getMaxlength() {
         return maxlength;
     }
 
-    public void setMaxlength(Integer maxlength) {
+    public void setMaxlength(Long maxlength) {
         this.maxlength = maxlength;
     }
 
