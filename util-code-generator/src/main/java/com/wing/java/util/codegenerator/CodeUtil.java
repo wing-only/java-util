@@ -295,7 +295,7 @@ public class CodeUtil {
 			}
 			
 			if("NO".equals(is_nullable)){
-				en.setIsnullable(false);
+				en.setNullAble(false);
 			}
 			
 			entityslist.add(en);
@@ -304,7 +304,7 @@ public class CodeUtil {
 				en.setComment(column_comment + "_开始时间");
 				en.setColumnName(column_name + "_start");
 				en.setDataType(data_type);
-				en.setIsadd(true);
+				en.setAdd(true);
 				en.setOrgcolumnName(column_name);
 				reqentityslist.add(en);
 				en = new Entitys();
@@ -312,7 +312,7 @@ public class CodeUtil {
 				en.setColumnName(column_name + "_end");
 				en.setDataType(data_type);
 				en.setOrgcolumnName(column_name);
-				en.setIsadd(true);
+				en.setAdd(true);
 				reqentityslist.add(en);
 			}
 
@@ -322,7 +322,7 @@ public class CodeUtil {
 				en.setColumnName(column_name + "_name");
 				en.setDataType(data_type);
 				en.setOrgcolumnName(column_name);
-				en.setIsadd(true);
+				en.setAdd(true);
 				respentityslist.add(en);
 			}
 		}
@@ -435,7 +435,7 @@ public class CodeUtil {
     			sb.append("\t/**\r\n");
     			sb.append("\t* ").append(entitys.getComment()).append("\r\n");
     			sb.append("\t*/ \r\n");
-    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isIsnullable()   +") \r\n");
+    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isNullAble()   +") \r\n");
     			sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
     		}
     	}
@@ -453,7 +453,7 @@ public class CodeUtil {
     			sb.append("\t/**\r\n");
     			sb.append("\t* ").append(entitys.getComment()).append("\r\n");
     			sb.append("\t*/ \r\n");
-    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isIsnullable()   +") \r\n");
+    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isNullAble()   +") \r\n");
     			sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
     		}
     	}
@@ -622,9 +622,9 @@ public class CodeUtil {
 			}
 
 			//
-			if (!entitys.isadd){
+			if (!entitys.add){
 				//
-				if(!entitys.isIsadd()){
+				if(!entitys.isAdd()){
 				    //jdbc
 				    if(entitys.getDataType().equalsIgnoreCase("date")) {
 				        columns.append("DATE_FORMAT("+columnName+",'%Y-%m-%d') "+columnName).append(",");
@@ -783,10 +783,10 @@ public class CodeUtil {
             sb.append("\t* ").append(entitys.getComment()).append("\r\n");
             sb.append("\t*/ \r\n");
             
-            if (entitys.isPk) {
+            if (entitys.pk) {
             	sb.append("\t@Null(message =\"ID必须为空\",groups={AddGroup.class}) \r\n");
             	sb.append("\t@NotNull(message =\"ID不能为空\",groups={UpdateGroup.class}) \r\n");
-            }else if (!entitys.isnullable && !"ctime".equalsIgnoreCase(entitys.getFieldName()) && !"cdate".equalsIgnoreCase(entitys.getFieldName())  && !"version".equalsIgnoreCase(entitys.getFieldName())) {
+            }else if (!entitys.nullAble && !"ctime".equalsIgnoreCase(entitys.getFieldName()) && !"cdate".equalsIgnoreCase(entitys.getFieldName())  && !"version".equalsIgnoreCase(entitys.getFieldName())) {
             	sb.append("\t@NotNull(message =\""+entitys.getComment()+"不能为空"+"\",groups=AddGroup.class) \r\n");
             	 if (entitys.getFieldType().equalsIgnoreCase("string")) {
             		 sb.append("\t@NotEmpty(message =\""+entitys.getComment()+"不能为空"+"\",groups=AddGroup.class) \r\n");
@@ -796,7 +796,7 @@ public class CodeUtil {
             if(entitys.getMaxlength()!=null){
                 sb.append("\t@Size(max="+entitys.getMaxlength()+" ,message =\""+entitys.getComment()+"最多"+entitys.getMaxlength()+"个字符\",groups=AddGroup.class) \r\n");
             }
-            sb.append("\t@ApiModelProperty(value=\""+entitys.getComment()+"\",name=\""+entitys.getFieldName()+"\",required="+ !entitys.isIsnullable()   +") \r\n");
+            sb.append("\t@ApiModelProperty(value=\""+entitys.getComment()+"\",name=\""+entitys.getFieldName()+"\",required="+ !entitys.isNullAble()   +") \r\n");
             if("time".equalsIgnoreCase(entitys.getDataType())){//数据库类型为time时，需要单独转换一下
             	sb.append("\tprotected Date " + entitys.getFieldName() + ";\r\n\r\n");
             }else {

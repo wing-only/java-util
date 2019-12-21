@@ -84,19 +84,19 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     public HttpRespParam handleDuplicateKeyException(DuplicateKeyException e) {
         log.error(e.getMessage(), e);
-        return new HttpRespParam(0, new HashMap(), "已存在该记录");
+        return new HttpRespParam(0, new HashMap(), "already exists");
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public HttpRespParam handleAuthorizationException(AuthenticationException e) {
         log.error(e.getMessage(), e);
-        return new HttpRespParam(ExceptionConstant.SC_UNAUTHORIZED, new HashMap(), "请重新登录");
+        return new HttpRespParam(ExceptionConstant.SC_UNAUTHORIZED, new HashMap(), "login invalid");
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public HttpRespParam handleAuthorizationException(AuthorizationException e) {
         log.error(e.getMessage(), e);
-        return new HttpRespParam(ExceptionConstant.SC_FORBIDDEN, new HashMap(), "权限不足，请联系管理员授权");
+        return new HttpRespParam(ExceptionConstant.SC_FORBIDDEN, new HashMap(), "permission denied");
     }
 
 

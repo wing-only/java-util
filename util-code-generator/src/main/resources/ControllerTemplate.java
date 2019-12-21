@@ -1,9 +1,14 @@
-package @controllerPackage@;
+package
+
+import lombok.extern.slf4j.Slf4j;
+
+@controllerPackage@;
 
 import @modelPackage@.@ModelName@;
 import @voPackage@.@ModelName@QryReqVo;
 import @voPackage@.@ModelName@QryRespVo;
 import @IServicePackage@.@IService@;
+import lombok.extern.slf4j.Slf4j;
 import com.wing.java.util.BaseController;
 import com.wing.java.util.param.page.Page;
 import com.wing.java.util.param.http.HttpRespParam;
@@ -33,6 +38,7 @@ import java.util.List;
 @Api(value = "@serviceComment@接口",tags="@serviceComment@接口")
 @RestController
 @RequestMapping("/@ModelName@")
+@Slf4j
 @SuppressWarnings("all")
 public class @ModelName@Controller extends BaseController{
 
