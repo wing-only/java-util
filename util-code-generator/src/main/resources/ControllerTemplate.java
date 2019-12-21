@@ -1,8 +1,4 @@
-package
-
-import lombok.extern.slf4j.Slf4j;
-
-@controllerPackage@;
+package @controllerPackage@;
 
 import @modelPackage@.@ModelName@;
 import @voPackage@.@ModelName@QryReqVo;
