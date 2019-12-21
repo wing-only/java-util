@@ -1,5 +1,6 @@
 package com.wing.java.util.codegenerator;
 
+import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -71,7 +72,6 @@ public class CodeGenerator extends AbstractMojo {
      */
     private Properties loadProperties() {
         Properties properties = new Properties();
-
 //        InputStream inputStream = CodeGenerate.class.getClassLoader().getResourceAsStream("codeGenerate.properties");
         InputStream inputStream = null;
 

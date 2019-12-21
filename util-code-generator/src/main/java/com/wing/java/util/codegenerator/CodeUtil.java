@@ -44,14 +44,14 @@ public class CodeUtil {
 	String password;
 	String dbName;
 
-	//	========================= 以下为默认配置 =========================
+	//	========================= 以下为模板配置 =========================
 
 	// controller模板文件
 	String ControllerTemplateFile = "ControllerTemplate.java";
 	//service模板
-	String iserviceTemplateFile = "IServceTemplate.java";
+	String iserviceTemplateFile = "IServiceTemplate.java";
 	//serviceImpl模板
-	String serviceImplTemplateFile = "ServiecImplTemplate.java";
+	String serviceImplTemplateFile = "ServiceImplTemplate.java";
     // dao模板文件
 	String DaoTemplateFile = "DaoTemplate.java";
 	// mapper模板文件
@@ -62,23 +62,23 @@ public class CodeUtil {
 	String QryReqVoTemplateFile = "QryReqVoTemplate.java";
 	// resp模板文件  枚举
 	String QryRespVoTemplateFile = "QryRespVoTemplate.java";
-
 	//dubbo模板
 	String dubboConfigFile = "dubbo.txt";
-	
-	//临时变量
-    String controllerTemplate = "";
-	String IserviceTemplate = "";
-	String serviceImplTemplate = "";
-	String daoTemplate = "";
-	String modelTemplate = "";
-	String tableComment="";
-	String entityName = "";
-	String mappingTemplate="";
-	String reqvoTemplate="";
-	String respvoTemplate="";
 
-	String dubboConfigTemplate = "";
+	//	========================= 以下为临时变量 =========================
+
+	//临时变量，要生成的文件内容
+    String controllerContent = "";
+	String iserviceContent = "";
+	String serviceImplContent = "";
+	String daoContent = "";
+	String modelContent = "";
+	String mapperContent ="";
+	String reqVoContent ="";
+	String respVoContent ="";
+	String dubboConfigContent = "";
+	String entityName = "";
+	String tableComment="";
 
 	//数据库字段类型与Java类型映射
 	Map<String, String> jdbc2javatypes = new HashMap<String, String>();
@@ -96,20 +96,23 @@ public class CodeUtil {
 	Entitys pk = null;
 	String enter = getSeparator();
     String currenttime = getNow();
-	
+
+    //代码生成入口方法
 	void generatorCode() {
 		try {
 			init();
 			readTableInfo();
-			//
+
+			//替换模板数据，给各个变量赋值
 			getController();
-			getService();
+			getIService();
 			getServiceImpl();
 			getDao();
-			getMapping();
+			getMapper();
 			getModel();
 			getVo();
 			getDubboConfig();
+
 			// 写文件
 			writeFile();
 		} catch (Exception e) {
@@ -125,22 +128,22 @@ public class CodeUtil {
 	 */
 	void init() throws Exception {
 
-		sql2jdbctypes.put("BIGINT", "BIGINT");
 		sql2jdbctypes.put("CHAR", "CHAR");
-		sql2jdbctypes.put("DATE", "DATE");
-		sql2jdbctypes.put("DATETIME", "TIMESTAMP");
-		sql2jdbctypes.put("TIMESTAMP", "TIMESTAMP");
-		sql2jdbctypes.put("DECIMAL", "DECIMAL");
-		sql2jdbctypes.put("DOUBLE", "DOUBLE");
 		sql2jdbctypes.put("ENUM", "CHAR");
-		sql2jdbctypes.put("FLOAT", "REAL");
-		sql2jdbctypes.put("INT", "INTEGER");
+		sql2jdbctypes.put("VARCHAR", "VARCHAR");
 		sql2jdbctypes.put("TINYINT", "TINYINT");
+		sql2jdbctypes.put("INT", "INTEGER");
+		sql2jdbctypes.put("BIGINT", "BIGINT");
+		sql2jdbctypes.put("FLOAT", "REAL");
+		sql2jdbctypes.put("DOUBLE", "DOUBLE");
+		sql2jdbctypes.put("DECIMAL", "DECIMAL");
 		sql2jdbctypes.put("TEXT", "LONGVARCHAR");
 		sql2jdbctypes.put("LONGTEXT", "LONGVARCHAR");
+		sql2jdbctypes.put("DATE", "DATE");
 		sql2jdbctypes.put("TIME", "TIME");
-		sql2jdbctypes.put("VARCHAR", "VARCHAR");
 		sql2jdbctypes.put("YEAR", "DATE");
+		sql2jdbctypes.put("DATETIME", "TIMESTAMP");
+		sql2jdbctypes.put("TIMESTAMP", "TIMESTAMP");
 
 		jdbc2javatypes.put("CHAR", "String");
 		jdbc2javatypes.put("VARCHAR", "String");
@@ -166,18 +169,17 @@ public class CodeUtil {
 		javatypesfullname.put("Float", "java.lang.Float");
 
 		datetypes.add("DATE");
+		datetypes.add("TIME");
 		datetypes.add("DATETIME");
 		datetypes.add("TIMESTAMP");
 
-		StringBuilder sb =null;
-
-		sb = new StringBuilder("");
+		StringBuilder sb = new StringBuilder("");
 		BufferedReader bReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(ControllerTemplateFile)));
 		String line = null;
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		controllerTemplate = sb.toString();
+		controllerContent = sb.toString();
 		bReader.close();
 
 
@@ -187,7 +189,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		mappingTemplate = sb.toString();
+		mapperContent = sb.toString();
 		bReader.close();
 
 
@@ -197,7 +199,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		daoTemplate = sb.toString();
+		daoContent = sb.toString();
 		bReader.close();
 
 		sb = new StringBuilder("");
@@ -206,7 +208,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		modelTemplate = sb.toString();
+		modelContent = sb.toString();
 		bReader.close();
 
 
@@ -216,7 +218,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		reqvoTemplate = sb.toString();
+		reqVoContent = sb.toString();
 		bReader.close();
 
 
@@ -226,7 +228,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		respvoTemplate = sb.toString();
+		respVoContent = sb.toString();
 		bReader.close();
 
 		sb = new StringBuilder("");
@@ -235,7 +237,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		serviceImplTemplate = sb.toString();
+		serviceImplContent = sb.toString();
 		bReader.close();
 
 		sb = new StringBuilder("");
@@ -244,7 +246,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		IserviceTemplate = sb.toString();
+		iserviceContent = sb.toString();
 		bReader.close();
 
 		sb = new StringBuilder("");
@@ -253,7 +255,7 @@ public class CodeUtil {
 		while ((line = bReader.readLine()) != null) {
 			sb.append(line).append(enter);
 		}
-		dubboConfigTemplate = sb.toString();
+		dubboConfigContent = sb.toString();
 		bReader.close();
 
 		File file = new File(baseOutputPath);
@@ -299,6 +301,8 @@ public class CodeUtil {
 			}
 			
 			entityslist.add(en);
+
+			//如果是日期、时间类型
 			if (datetypes.contains(en.getDataType())) {
 				en = new Entitys();
 				en.setComment(column_comment + "_开始时间");
@@ -316,6 +320,7 @@ public class CodeUtil {
 				reqentityslist.add(en);
 			}
 
+			//如果是枚举类型
 			if ( en.getColumnName().endsWith("_enum") ) {
 				en = new Entitys();
 				en.setComment(column_comment + "_name");
@@ -349,170 +354,55 @@ public class CodeUtil {
 		checkEntityslist();
 	}
 
-	/**
-	 * 生成文件
-	 * @throws FileNotFoundException
-	 * @throws UnsupportedEncodingException
-	 */
-	private void writeFile() throws FileNotFoundException, UnsupportedEncodingException {
-		
-		PrintWriter pw = null;
-		
-		pw = new PrintWriter(createFile((baseOutputPath + modelPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + ".java"), "utf-8");
-		pw.write(modelTemplate);
-		pw.flush();
-		
-		pw = new PrintWriter(createFile((baseOutputPath + daoPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Dao.java"), "utf-8");
-		pw.write(daoTemplate);
-		pw.flush();
-		
-		pw = new PrintWriter(createFile((baseOutputPath + mapperPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "Dao.xml"), "utf-8");
-		pw.write(mappingTemplate);
-		pw.flush();
-		pw = new PrintWriter(createFile((baseOutputPath + controllerPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Controller.java"), "utf-8");
-		pw.write(controllerTemplate);
-		pw.flush();
-		pw = new PrintWriter(createFile((baseOutputPath + voPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "QryReqVo.java"), "utf-8");
-		pw.write(reqvoTemplate);
-		pw.flush();
-		pw = new PrintWriter(createFile((baseOutputPath + voPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "QryRespVo.java"), "utf-8");
-		pw.write(respvoTemplate);
-		pw.flush();
-		
-		pw = new PrintWriter(createFile((baseOutputPath + iservicePackage + ".").replaceAll("\\.", "\\\\")+"I"+ this.entityName + "Service.java"), "utf-8");
-		pw.write(IserviceTemplate);
-		pw.flush();
-		pw = new PrintWriter(createFile((baseOutputPath + serviceImplPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "ServiceImpl.java"), "utf-8");
-		pw.write(serviceImplTemplate);
-		pw.flush();
-		pw.close();
-		
-		pw = new PrintWriter(createFile((baseOutputResourcesPath + dubboConfig + ".").replaceAll("\\.", "\\\\")+ "dubbo.txt"), "utf-8");
-		pw.write(dubboConfigTemplate);
-		pw.flush();
-		pw.close();
+	private void getController() {
+		String  serviceComment = tableComment;
+		if(tableComment.endsWith("表")) {
+			serviceComment=tableComment.substring(0,tableComment.length()-1)+"服务";
+		}
+
+		controllerContent = controllerContent.replaceAll("@serviceComment@", serviceComment);
+		controllerContent = controllerContent.replaceAll("@pkType@", pk.getFieldType());
+		controllerContent = controllerContent.replaceAll("@controllerPackage@", controllerPackage);
+		controllerContent = controllerContent.replaceAll("@tableComment@", tableComment);
+		controllerContent = controllerContent.replaceAll("@ModelName@", entityName);
+		controllerContent = controllerContent.replaceAll("@modelName@", toLowerCaseFirstOne(entityName));
+		controllerContent = controllerContent.replaceAll("@modelPackage@", modelPackage);
+		controllerContent = controllerContent.replaceAll("@voPackage@", voPackage);
+		controllerContent = controllerContent.replaceAll("@IService@", "I"+ entityName +"Service");
+		controllerContent = controllerContent.replaceAll("@IServicePackage@", iservicePackage);
+		controllerContent = controllerContent.replaceAll("@iService@", toLowerCaseFirstOne(entityName +"Service"));
 	}
 
-	private void getDao() {
-		
-		daoTemplate = daoTemplate.replaceAll("@daoPackage@", daoPackage);
-		daoTemplate = daoTemplate.replaceAll("@modelPackage@", modelPackage);
-		daoTemplate = daoTemplate.replaceAll("@entityName@", entityName);
-		daoTemplate = daoTemplate.replaceAll("@voPackage@", voPackage);
-		
-	}
-
-	/**
-	 * 生成reqVo和respVo
-	 */
-	private void getVo() {
-        String qryReqVoContents = processReqVoAttrs();
-        
-        reqvoTemplate = reqvoTemplate.replaceAll("@qryReqVoContent@", qryReqVoContents);
-        reqvoTemplate = reqvoTemplate.replaceAll("@tableComment@", tableComment);
-        reqvoTemplate = reqvoTemplate.replaceAll("@modelName@", entityName);
-        reqvoTemplate = reqvoTemplate.replaceAll("@voPackage@", voPackage);
-        reqvoTemplate = reqvoTemplate.replaceAll("@modelPackage@", modelPackage);
-        
-        String qryRespVoContents = processRespVoAttrs();
-        
-        respvoTemplate = respvoTemplate.replaceAll("@qryRespVoContent@", qryRespVoContents);
-        respvoTemplate = respvoTemplate.replaceAll("@tableComment@", tableComment);
-        respvoTemplate = respvoTemplate.replaceAll("@modelName@", entityName);
-        respvoTemplate = respvoTemplate.replaceAll("@voPackage@", voPackage);
-        respvoTemplate = respvoTemplate.replaceAll("@modelPackage@", modelPackage);
-		
-	}
-	
-    /**
-     * 功能：生成reqVo所有属性
-     */
-    private String processReqVoAttrs() {
-    	StringBuffer sb = new StringBuffer();
-    	
-    	if(reqentityslist != null && reqentityslist.size() > 0) {
-    		for (Entitys entitys : reqentityslist) {
-    			sb.append("\t/**\r\n");
-    			sb.append("\t* ").append(entitys.getComment()).append("\r\n");
-    			sb.append("\t*/ \r\n");
-    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isNullAble()   +") \r\n");
-    			sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
-    		}
-    	}
-        
-        return sb.toString();
-    }
-    /**
-     * 功能：生成respVo所有属性
-     */
-    private String processRespVoAttrs() {
-    	StringBuffer sb = new StringBuffer();
-    	
-    	if(respentityslist != null && respentityslist.size() > 0) {
-    		for (Entitys entitys : respentityslist) {
-    			sb.append("\t/**\r\n");
-    			sb.append("\t* ").append(entitys.getComment()).append("\r\n");
-    			sb.append("\t*/ \r\n");
-    			sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isNullAble()   +") \r\n");
-    			sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
-    		}
-    	}
-    	
-    	return sb.toString();
-    }
-
-	private void getService() {
-	    
-	    IserviceTemplate = IserviceTemplate.replaceAll("@ModelName@", entityName);
-	    IserviceTemplate = IserviceTemplate.replaceAll("@modelPackage@", modelPackage);
+	private void getIService() {
+	    iserviceContent = iserviceContent.replaceAll("@ModelName@", entityName);
+	    iserviceContent = iserviceContent.replaceAll("@modelPackage@", modelPackage);
 	    
 //	    IserviceTemplate = IserviceTemplate.replaceAll("@pkType@", pk.getFieldType());
-	    IserviceTemplate = IserviceTemplate.replaceAll("@IServicePackage@", iservicePackage);
-	    IserviceTemplate = IserviceTemplate.replaceAll("@voPackage@", voPackage);
-	    IserviceTemplate = IserviceTemplate.replaceAll("@modelName@", modelName);
+	    iserviceContent = iserviceContent.replaceAll("@IServicePackage@", iservicePackage);
+	    iserviceContent = iserviceContent.replaceAll("@voPackage@", voPackage);
+	    iserviceContent = iserviceContent.replaceAll("@modelName@", modelName);
 	}
 
 	private void getServiceImpl() {
-	    
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@ModelName@", entityName);
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@modelPackage@", modelPackage);
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@voPackage@", voPackage);
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@daoPackage@", daoPackage);
+	    serviceImplContent = serviceImplContent.replaceAll("@ModelName@", entityName);
+	    serviceImplContent = serviceImplContent.replaceAll("@modelPackage@", modelPackage);
+	    serviceImplContent = serviceImplContent.replaceAll("@voPackage@", voPackage);
+	    serviceImplContent = serviceImplContent.replaceAll("@daoPackage@", daoPackage);
 //	    serviceImplTemplate = serviceImplTemplate.replaceAll("@pkType@", pk.getFieldType());
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@ServiceImplPackage@", serviceImplPackage);
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@modelName@", modelName);
-	    serviceImplTemplate = serviceImplTemplate.replaceAll("@variableName@", toLowerCaseFirstOne(modelName));
-	    serviceImplTemplate= serviceImplTemplate.replaceAll("@IServicePackage@", iservicePackage);
-	}
-	
-	private void getDubboConfig() {
-		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@ModelName@", entityName);
-		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@ServiceImplPackage@", serviceImplPackage);
-		dubboConfigTemplate = dubboConfigTemplate.replaceAll("@variableName@", toLowerCaseFirstOne(modelName));
-		dubboConfigTemplate= dubboConfigTemplate.replaceAll("@IServicePackage@", iservicePackage);
+	    serviceImplContent = serviceImplContent.replaceAll("@ServiceImplPackage@", serviceImplPackage);
+	    serviceImplContent = serviceImplContent.replaceAll("@modelName@", modelName);
+	    serviceImplContent = serviceImplContent.replaceAll("@variableName@", toLowerCaseFirstOne(modelName));
+	    serviceImplContent = serviceImplContent.replaceAll("@IServicePackage@", iservicePackage);
 	}
 
-    private void getController() {
-        String  serviceComment = tableComment;
-        if(tableComment.endsWith("表")) {
-            serviceComment=tableComment.substring(0,tableComment.length()-1)+"服务";
-        }
-        
-        controllerTemplate = controllerTemplate.replaceAll("@serviceComment@", serviceComment);
-        controllerTemplate = controllerTemplate.replaceAll("@pkType@", pk.getFieldType());
-        controllerTemplate = controllerTemplate.replaceAll("@controllerPackage@", controllerPackage);
-        controllerTemplate = controllerTemplate.replaceAll("@tableComment@", tableComment);
-        controllerTemplate = controllerTemplate.replaceAll("@ModelName@", entityName);
-        controllerTemplate = controllerTemplate.replaceAll("@modelName@", toLowerCaseFirstOne(entityName));
-        controllerTemplate = controllerTemplate.replaceAll("@modelPackage@", modelPackage);
-        controllerTemplate = controllerTemplate.replaceAll("@voPackage@", voPackage);
-        controllerTemplate = controllerTemplate.replaceAll("@IService@", "I"+ entityName +"Service");
-        controllerTemplate = controllerTemplate.replaceAll("@IServicePackage@", iservicePackage);
-        controllerTemplate = controllerTemplate.replaceAll("@iService@", toLowerCaseFirstOne(entityName +"Service"));
+	private void getDao() {
+		daoContent = daoContent.replaceAll("@daoPackage@", daoPackage);
+		daoContent = daoContent.replaceAll("@modelPackage@", modelPackage);
+		daoContent = daoContent.replaceAll("@entityName@", entityName);
+		daoContent = daoContent.replaceAll("@voPackage@", voPackage);
 	}
 
-
-	private void getMapping() {
+	private void getMapper() {
 		String BaseResultMapline = "\t\t<result column=\"%s\" property=\"%s\" jdbcType=\"%s\" />";
 		String BaseResultMapline2 = "\t\t<result column=\"%s\" property=\"%s\" jdbcType=\"%s\" javaType=\"byte[]\" typeHandler=\"org.apache.ibatis.type.BlobTypeHandler\" />";
 
@@ -569,6 +459,7 @@ public class CodeUtil {
 			//
 			String wherecolumnscompare = "=";
 
+			//TODO 带有项目色彩
 			if(!"Date".equals(fieldType)){
 				String wcs3 = columnName + wherecolumnscompare + "#{" + fieldName + ",jdbcType="+dataType+"}";
 				String wcs4 = columnName + wherecolumnscompare + "#{param." + fieldName + ",jdbcType="+dataType+"}";
@@ -644,16 +535,16 @@ public class CodeUtil {
 				}
 				BaseResultMapColumns.append(String.format(basemapline, columnName, fieldName, dataType)).append(enter);
 				
-				if("c_date".equalsIgnoreCase(entitys.getColumnName()) || "c_time".equalsIgnoreCase(entitys.getColumnName())){
+				if("create_date".equalsIgnoreCase(entitys.getColumnName()) || "create_time".equalsIgnoreCase(entitys.getColumnName())){
 					insert.append("\t\tnow(),").append(enter);
 					insertColumns.append(String.format(insertDyline2,fieldName,columnName)).append(enter);
 					insertDynamicColumns.append("\t\t\tnow(),").append(enter);
-				}else if("version".equalsIgnoreCase(entitys.getColumnName())){
+				}else if("lock_version".equalsIgnoreCase(entitys.getColumnName())){
 					insert.append("\t\t1,").append(enter);
 					insertColumns.append(String.format(insertDyline2,fieldName,columnName)).append(enter);
 					insertDynamicColumns.append("\t\t\t1,").append(enter);
 			    }
-				else if("u_date".equalsIgnoreCase(entitys.getColumnName()) || "u_time".equalsIgnoreCase(entitys.getColumnName())){
+				else if("update_date".equalsIgnoreCase(entitys.getColumnName()) || "update_time".equalsIgnoreCase(entitys.getColumnName())){
 			    	insert.append("\t\tnull,").append(enter);
 			    	insertColumns.append(String.format(insertDyline2,fieldName,columnName)).append(enter);
 			    	insertDynamicColumns.append("\t\t\tnull,").append(enter);
@@ -670,16 +561,16 @@ public class CodeUtil {
 				
 				//
 				if(!entitys.getColumnName().equalsIgnoreCase("id")) {
-					if("u_date".equalsIgnoreCase(entitys.getColumnName())){
-						updateColumns.append("\t\t\tu_date = now(),").append(enter);
-						updateAllColumnEntity.append("\t\t\tu_date = now(),").append(enter);
-					}else if("u_time".equalsIgnoreCase(entitys.getColumnName())){
-						updateColumns.append("\t\t\tu_time = now(),").append(enter);
-						updateAllColumnEntity.append("\t\t\tu_time = now(),").append(enter);
+					if("update_date".equalsIgnoreCase(entitys.getColumnName())){
+						updateColumns.append("\t\t\tupdate_date = now(),").append(enter);
+						updateAllColumnEntity.append("\t\t\tupdate_date = now(),").append(enter);
+					}else if("update_time".equalsIgnoreCase(entitys.getColumnName())){
+						updateColumns.append("\t\t\tupdate_time = now(),").append(enter);
+						updateAllColumnEntity.append("\t\t\tupdate_time = now(),").append(enter);
 					}
-/*					else if("version".equalsIgnoreCase(entitys.getColumnName())){
-				    	updateColumns.append("\t\t\tversion = #{versionPlus,jdbcType=INTEGER},").append(enter);
-				    	updateAllColumnEntity.append("\t\t\tversion = #{versionPlus,jdbcType=INTEGER},").append(enter);
+/*					else if("lock_version".equalsIgnoreCase(entitys.getColumnName())){
+				    	updateColumns.append("\t\t\tlock_version = #{lockVersionPlus,jdbcType=INTEGER},").append(enter);
+				    	updateAllColumnEntity.append("\t\t\tlock_version = #{lockVersionPlus,jdbcType=INTEGER},").append(enter);
 					}*/
 					else{
 						updateColumns.append(String.format(updateline, columnName, fieldName, dataType)).append(enter);
@@ -687,17 +578,17 @@ public class CodeUtil {
 					}
 				}
 			    
-			    /*if(fieldName.equalsIgnoreCase("version")) {
-			        updateDynamicColumns.append("\t\t\tversion = #{versionPlus,jdbcType=INTEGER},").append(enter);
-			        updateColumnEntity.append("\t\t\tversion = #{versionPlus,jdbcType=INTEGER},").append(enter);
+			    /*if(fieldName.equalsIgnoreCase("lockVersion")) {
+			        updateDynamicColumns.append("\t\t\tlock_version = #{lockVersionPlus,jdbcType=INTEGER},").append(enter);
+			        updateColumnEntity.append("\t\t\tlock_version = #{lockVersionPlus,jdbcType=INTEGER},").append(enter);
 			    }else */
 			    if(!fieldName.equalsIgnoreCase("id")) {
-			    	if(fieldName.equals("udate")) {
-			    		updateDynamicColumns.append("\t\t\tu_date = now(),").append(enter);
-			    		updateColumnEntity.append("\t\t\tu_date = now(),").append(enter);
-			    	}else if(fieldName.equals("utime")) {
-			    		updateDynamicColumns.append("\t\t\tu_time = now(),").append(enter);
-			    		updateColumnEntity.append("\t\t\tu_time = now(),").append(enter);
+			    	if(fieldName.equals("updateDate")) {
+			    		updateDynamicColumns.append("\t\t\tupdate_date = now(),").append(enter);
+			    		updateColumnEntity.append("\t\t\tupdate_date = now(),").append(enter);
+			    	}else if(fieldName.equals("updateTime")) {
+			    		updateDynamicColumns.append("\t\t\tupdate_time = now(),").append(enter);
+			    		updateColumnEntity.append("\t\t\tupdate_time = now(),").append(enter);
 			    	}else {
 			    		if("String".equals(fieldType)) {
 			    			updateDynamicColumns.append(String .format(updateDynamicColumnsline, fieldName,fieldName,columnName,fieldName,dataType)).append(enter);
@@ -727,25 +618,25 @@ public class CodeUtil {
 		updateColumns.deleteCharAt(updateColumns.length() - 3);
 		updateAllColumnEntity.deleteCharAt(updateAllColumnEntity.length() - 3);
 		
-		mappingTemplate = mappingTemplate.replaceAll("@pkJavaType@", getPkJavaFullname(pk));
-		mappingTemplate = mappingTemplate.replaceAll("@ById@", ById);
-		mappingTemplate = mappingTemplate.replaceAll("@updateColumns@", updateColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@tableName@", tableName);
+		mapperContent = mapperContent.replaceAll("@pkJavaType@", getPkJavaFullname(pk));
+		mapperContent = mapperContent.replaceAll("@ById@", ById);
+		mapperContent = mapperContent.replaceAll("@updateColumns@", updateColumns.toString());
+		mapperContent = mapperContent.replaceAll("@tableName@", tableName);
 //		mappingTemplate = mappingTemplate.replaceAll("@BaseResultMapColumns@", BaseResultMapColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@columns@", columns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@insertAllColumns@", insertAllColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@modeclasspath@", modeclasspath);
-		mappingTemplate = mappingTemplate.replaceAll("@entityClasspath@", entityClasspath);
-		mappingTemplate = mappingTemplate.replaceAll("@reqModeclasspath@", reqModeclasspath);
-		mappingTemplate = mappingTemplate.replaceAll("@respModeclasspath@", respModeclasspath);
-		mappingTemplate = mappingTemplate.replaceAll("@wherecolumns@", wherecolumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@whereParamColumns@", whereParamColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@insert@", insert.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@insertColumns@", insertColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@insertDynamicColumns@", insertDynamicColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@updateDynamicColumns@", updateDynamicColumns.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@updateColumnEntity@", updateColumnEntity.toString());
-		mappingTemplate = mappingTemplate.replaceAll("@updateAllColumnEntity@", updateAllColumnEntity.toString());
+		mapperContent = mapperContent.replaceAll("@columns@", columns.toString());
+		mapperContent = mapperContent.replaceAll("@insertAllColumns@", insertAllColumns.toString());
+		mapperContent = mapperContent.replaceAll("@modeclasspath@", modeclasspath);
+		mapperContent = mapperContent.replaceAll("@entityClasspath@", entityClasspath);
+		mapperContent = mapperContent.replaceAll("@reqModeclasspath@", reqModeclasspath);
+		mapperContent = mapperContent.replaceAll("@respModeclasspath@", respModeclasspath);
+		mapperContent = mapperContent.replaceAll("@wherecolumns@", wherecolumns.toString());
+		mapperContent = mapperContent.replaceAll("@whereParamColumns@", whereParamColumns.toString());
+		mapperContent = mapperContent.replaceAll("@insert@", insert.toString());
+		mapperContent = mapperContent.replaceAll("@insertColumns@", insertColumns.toString());
+		mapperContent = mapperContent.replaceAll("@insertDynamicColumns@", insertDynamicColumns.toString());
+		mapperContent = mapperContent.replaceAll("@updateDynamicColumns@", updateDynamicColumns.toString());
+		mapperContent = mapperContent.replaceAll("@updateColumnEntity@", updateColumnEntity.toString());
+		mapperContent = mapperContent.replaceAll("@updateAllColumnEntity@", updateAllColumnEntity.toString());
 	}
 
 	private String getPkJavaFullname(Entitys pk2) {
@@ -761,16 +652,14 @@ public class CodeUtil {
      * @return
      */
     private void getModel() {
-        
         String modelContents = processAllAttrs();
         
-        modelTemplate = modelTemplate.replaceAll("@modelContents@", modelContents);
-        modelTemplate = modelTemplate.replaceAll("@tableName@", tableName);
-        modelTemplate = modelTemplate.replaceAll("@tableComment@", tableComment);
-        modelTemplate = modelTemplate.replaceAll("@currenttime@", currenttime);
-        modelTemplate = modelTemplate.replaceAll("@entityName@", entityName);
-        modelTemplate = modelTemplate.replaceAll("@modelPackage@", modelPackage);
-        
+        modelContent = modelContent.replaceAll("@modelContents@", modelContents);
+        modelContent = modelContent.replaceAll("@tableName@", tableName);
+        modelContent = modelContent.replaceAll("@tableComment@", tableComment);
+        modelContent = modelContent.replaceAll("@currenttime@", currenttime);
+        modelContent = modelContent.replaceAll("@entityName@", entityName);
+        modelContent = modelContent.replaceAll("@modelPackage@", modelPackage);
     }
     /**
      * 功能：生成所有属性
@@ -786,7 +675,7 @@ public class CodeUtil {
             if (entitys.pk) {
             	sb.append("\t@Null(message =\"ID必须为空\",groups={AddGroup.class}) \r\n");
             	sb.append("\t@NotNull(message =\"ID不能为空\",groups={UpdateGroup.class}) \r\n");
-            }else if (!entitys.nullAble && !"ctime".equalsIgnoreCase(entitys.getFieldName()) && !"cdate".equalsIgnoreCase(entitys.getFieldName())  && !"version".equalsIgnoreCase(entitys.getFieldName())) {
+            }else if (!entitys.nullAble && !"createTime".equalsIgnoreCase(entitys.getFieldName()) && !"createDate".equalsIgnoreCase(entitys.getFieldName())  && !"lockVersion".equalsIgnoreCase(entitys.getFieldName())) {
             	sb.append("\t@NotNull(message =\""+entitys.getComment()+"不能为空"+"\",groups=AddGroup.class) \r\n");
             	 if (entitys.getFieldType().equalsIgnoreCase("string")) {
             		 sb.append("\t@NotEmpty(message =\""+entitys.getComment()+"不能为空"+"\",groups=AddGroup.class) \r\n");
@@ -808,9 +697,9 @@ public class CodeUtil {
     }
 
 	/**
-	 * 功能：生成所有方法
+	 * 功能：生成所有方法，暂不使用，使用lombok
 	 */
-	private void processAllMethod(StringBuffer sb) {
+	/*private void processAllMethod(StringBuffer sb) {
 		for (Entitys entitys : entityslist) {
 			String fieldName = entitys.getFieldName();
 			String fieldType = entitys.getFieldType();
@@ -835,9 +724,63 @@ public class CodeUtil {
 		sb.append(" ]\";").append(enter);
 		
 		sb.append("\t}").append(enter);
+	}*/
+
+	/**
+	 * 生成reqVo和respVo
+	 */
+	private void getVo() {
+		String qryReqVoContents = processReqVoAttrs();
+		reqVoContent = reqVoContent.replaceAll("@qryReqVoContent@", qryReqVoContents);
+		reqVoContent = reqVoContent.replaceAll("@tableComment@", tableComment);
+		reqVoContent = reqVoContent.replaceAll("@modelName@", entityName);
+		reqVoContent = reqVoContent.replaceAll("@voPackage@", voPackage);
+		reqVoContent = reqVoContent.replaceAll("@modelPackage@", modelPackage);
+
+		String qryRespVoContents = processRespVoAttrs();
+		respVoContent = respVoContent.replaceAll("@qryRespVoContent@", qryRespVoContents);
+		respVoContent = respVoContent.replaceAll("@tableComment@", tableComment);
+		respVoContent = respVoContent.replaceAll("@modelName@", entityName);
+		respVoContent = respVoContent.replaceAll("@voPackage@", voPackage);
+		respVoContent = respVoContent.replaceAll("@modelPackage@", modelPackage);
 	}
 
-	
+	/**
+	 * 功能：生成reqVo所有属性
+	 */
+	private String processReqVoAttrs() {
+		StringBuffer sb = new StringBuffer();
+
+		if(reqentityslist != null && reqentityslist.size() > 0) {
+			for (Entitys entitys : reqentityslist) {
+				sb.append("\t/**\r\n");
+				sb.append("\t* ").append(entitys.getComment()).append("\r\n");
+				sb.append("\t*/ \r\n");
+				sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isNullAble()   +") \r\n");
+				sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
+			}
+		}
+
+		return sb.toString();
+	}
+	/**
+	 * 功能：生成respVo所有属性
+	 */
+	private String processRespVoAttrs() {
+		StringBuffer sb = new StringBuffer();
+
+		if(respentityslist != null && respentityslist.size() > 0) {
+			for (Entitys entitys : respentityslist) {
+				sb.append("\t/**\r\n");
+				sb.append("\t* ").append(entitys.getComment()).append("\r\n");
+				sb.append("\t*/ \r\n");
+				sb.append("\t@ApiModelProperty(name=\""+entitys.getFieldName()+"\", value=\""+entitys.getComment()+"\", required="+ !entitys.isNullAble()   +") \r\n");
+				sb.append("\tprivate " + entitys.getFieldType() + " " + entitys.getFieldName() + ";\r\n\r\n");
+			}
+		}
+
+		return sb.toString();
+	}
 	
 	String getFieldName(String columnName) {
 		if (columnName.indexOf("_") == -1) {
@@ -880,9 +823,63 @@ public class CodeUtil {
 		}
     }
 
+	private void getDubboConfig() {
+		dubboConfigContent = dubboConfigContent.replaceAll("@ModelName@", entityName);
+		dubboConfigContent = dubboConfigContent.replaceAll("@ServiceImplPackage@", serviceImplPackage);
+		dubboConfigContent = dubboConfigContent.replaceAll("@variableName@", toLowerCaseFirstOne(modelName));
+		dubboConfigContent = dubboConfigContent.replaceAll("@IServicePackage@", iservicePackage);
+	}
+
     private String covertSqltype2JdbcType(String dataType) {
         return sql2jdbctypes.get(dataType);
     }
 
+	/**
+	 * 生成文件
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException
+	 */
+	private void writeFile() throws FileNotFoundException, UnsupportedEncodingException {
+		PrintWriter pw = null;
+
+		pw = new PrintWriter(createFile((baseOutputPath + modelPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + ".java"), "utf-8");
+		pw.write(modelContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + daoPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Dao.java"), "utf-8");
+		pw.write(daoContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + mapperPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "Dao.xml"), "utf-8");
+		pw.write(mapperContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + controllerPackage + ".").replaceAll("\\.", "\\\\") + this.entityName + "Controller.java"), "utf-8");
+		pw.write(controllerContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + voPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "QryReqVo.java"), "utf-8");
+		pw.write(reqVoContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + voPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "QryRespVo.java"), "utf-8");
+		pw.write(respVoContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + iservicePackage + ".").replaceAll("\\.", "\\\\")+"I"+ this.entityName + "Service.java"), "utf-8");
+		pw.write(iserviceContent);
+		pw.flush();
+
+		pw = new PrintWriter(createFile((baseOutputPath + serviceImplPackage + ".").replaceAll("\\.", "\\\\")+ this.entityName + "ServiceImpl.java"), "utf-8");
+		pw.write(serviceImplContent);
+		pw.flush();
+
+		pw.close();
+
+		pw = new PrintWriter(createFile((baseOutputResourcesPath + dubboConfig + ".").replaceAll("\\.", "\\\\")+ "dubbo.txt"), "utf-8");
+		pw.write(dubboConfigContent);
+		pw.flush();
+		pw.close();
+	}
 	
 }
