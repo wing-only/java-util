@@ -137,6 +137,7 @@ public class CodeUtil {
 		sql2jdbctypes.put("INT", "INTEGER");
 		sql2jdbctypes.put("TINYINT", "TINYINT");
 		sql2jdbctypes.put("TEXT", "LONGVARCHAR");
+		sql2jdbctypes.put("LONGTEXT", "LONGVARCHAR");
 		sql2jdbctypes.put("TIME", "TIME");
 		sql2jdbctypes.put("VARCHAR", "VARCHAR");
 		sql2jdbctypes.put("YEAR", "DATE");
@@ -286,7 +287,7 @@ public class CodeUtil {
 			en.setDataType(data_type);
 			en.setComment(column_comment);
 			if(character_maximum_length!=null && !"longblob".equalsIgnoreCase(data_type)){
-				en.setMaxlength(Long.parseLong(character_maximum_length));
+				en.setMaxlength(Long.parseLong(character_maximum_length) );
 			}
 			if ( column_key.contains("PRI")) {
 				en.setPk(true);

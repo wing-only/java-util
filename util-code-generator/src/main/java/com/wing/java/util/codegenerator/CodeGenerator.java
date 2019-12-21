@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import static com.wing.java.util.codegenerator.InnerUtil.initcap;
 
+
 @Mojo(name = "generate")
 public class CodeGenerator extends AbstractMojo {
 
