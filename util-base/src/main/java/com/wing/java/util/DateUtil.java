@@ -1,5 +1,7 @@
 package com.wing.java.util;
 
+import cn.hutool.core.date.DateTime;
+
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +34,7 @@ public class DateUtil {
 	public static final String HHmmssS = "HHmmssS";
 	public static final String HHmmss = "HHmmss";
 
-	
+
 	/**
 	 * 根据指定格式转换指定日期
 	 */
@@ -74,21 +76,49 @@ public class DateUtil {
 	public static String getNow(String format) {
 		return new SimpleDateFormat(format).format(new Date());
 	}
-	
+
 	/**
 	 * 日期加减
 	 */
-	public static String operateDate(int addDay, String format) {
-		 Calendar calendar = Calendar.getInstance();
-		 calendar.setTime(new Date()); 
-		 calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + addDay); //让日期加1  
-		 Date time = calendar.getTime();
-		 return new SimpleDateFormat(format).format(calendar.getTime());
+	public static Date operateDate(int addDay) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.DAY_OF_MONTH, addDay);
+		return cal.getTime();
 	}
-	
-	
+
 	/**
-	 * 获取30天前的日期
+	 * 日期加减 + 格式化
+	 */
+	public static String operateDate(int addDay, String format) {
+		 Calendar cal = Calendar.getInstance();
+		 cal.setTime(new Date());
+		 cal.add(Calendar.DAY_OF_MONTH, addDay);
+		 return new SimpleDateFormat(format).format(cal.getTime());
+	}
+
+	/**
+	 * 日期加减，当前时间，根据单位
+	 */
+	public static Date operateDate(int add, TimeUnit timeUnit) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(timeUnit.getUnit(), add);
+		return cal.getTime();
+	}
+
+	/**
+	 * 日期加减, 指定时间，根据单位
+	 */
+	public static Date operateDate(Date currentDate, int add, TimeUnit timeUnit) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(currentDate);
+		cal.add(timeUnit.getUnit(), add);
+		return cal.getTime();
+	}
+
+	/**
+	 * 获取一个月前的日期
 	 */
 	public static String getLastMonth(String format){
 		Calendar cl = Calendar.getInstance();
@@ -280,5 +310,78 @@ public class DateUtil {
 	 */
 	public static long getSecondBetweenTwoDate(Date largeDate, Date smallDate){
 		return (largeDate.getTime() - smallDate.getTime()) / 1000;
+	}
+
+	/**
+	 * 获取当天0点时间
+	 * @return
+	 */
+	public static Date get0Point(){
+		return get0Point(new Date());
+	}
+
+	/**
+	 * 获取指定日期 0点时间
+	 * @param currentDate
+	 * @return
+	 */
+	public static Date get0Point(Date currentDate){
+		return cn.hutool.core.date.DateUtil.beginOfDay(currentDate);
+	}
+
+	/**
+	 * 获取当天 24点时间
+	 * @return
+	 */
+	public static Date get24Point(){
+		return get24Point(new Date());
+	}
+
+	/**
+	 * 获取指定日期 24点时间
+	 * @param currentDate
+	 * @return
+	 */
+	public static Date get24Point(Date currentDate){
+		return cn.hutool.core.date.DateUtil.endOfDay(currentDate);
+	}
+
+	/**
+	 * 获取昨天0点
+	 * @return
+	 */
+	public static Date getLastDay0Point(){
+		return cn.hutool.core.date.DateUtil.beginOfDay(operateDate(-1));
+	}
+
+	/**
+	 * 获取昨天23:59:59
+	 * @return
+	 */
+	public static Date getLastDay24Point(){
+		return cn.hutool.core.date.DateUtil.endOfDay(operateDate(-1));
+	}
+
+	public enum TimeUnit{
+		DAY(Calendar.DAY_OF_MONTH, "天"),
+		HOUR(Calendar.HOUR_OF_DAY, "时"),
+		MINUTE(Calendar.MINUTE, "分"),
+		SECOND(Calendar.SECOND, "秒");
+
+		TimeUnit(int unit, String name) {
+			this.unit = unit;
+			this.name = name;
+		}
+
+		int unit;
+		String name;
+
+		public int getUnit() {
+			return unit;
+		}
+
+		public String getName() {
+			return name;
+		}
 	}
 }
