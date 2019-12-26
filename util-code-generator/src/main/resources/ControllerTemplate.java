@@ -90,7 +90,7 @@ public class @ModelName@Controller extends BaseController{
      * 查询接口，通过id数组查找
      */
     @PostMapping("/selectByIds")
-    @ApiOperation(value="查询接口，通过id数组查找", notes="查询接口，通过id数组查找，返回实体列表",response=@ModelName@QryRespVo.class)
+    @ApiOperation(value="查询接口，通过id数组查找", notes="查询接口，通过id数组查找，返回实体列表",response=@ModelName@QryRespVo[].class)
     public HttpRespParam selectByIds(@RequestBody Collection<Long> ids){
         List<@ModelName@QryRespVo> @modelName@QryRespVos = @iService@.selectByIds(ids);
         return success(@modelName@QryRespVos);
