@@ -3,6 +3,7 @@ package com.wing.java.util.security.rsa;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
+import java.io.ByteArrayOutputStream;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -64,7 +65,26 @@ public class RsaUtil {
         //数据加密
         Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
         cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-        return cipher.doFinal(data);
+
+        final int len = data.length;//字符串长度
+        int offset = 0;//偏移量
+        int i = 0;//所分的段数
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        while (len > offset) {
+            byte[] cache;
+            if (len - offset > 117) {
+                cache = cipher.doFinal(data, offset, 117);
+            } else {
+                cache = cipher.doFinal(data, offset, len - offset);
+            }
+            bos.write(cache);
+            i++;
+            offset = 117 * i;
+        }
+        bos.close();
+
+        return bos.toByteArray();
     }
 
     /**
@@ -87,7 +107,25 @@ public class RsaUtil {
         //数据加密
         Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-        return cipher.doFinal(data);
+        final int len = data.length;//字符串长度
+        int offset = 0;//偏移量
+        int i = 0;//所分的段数
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        while (len > offset) {
+            byte[] cache;
+            if (len - offset > 117) {
+                cache = cipher.doFinal(data, offset, 117);
+            } else {
+                cache = cipher.doFinal(data, offset, len - offset);
+            }
+            bos.write(cache);
+            i++;
+            offset = 117 * i;
+        }
+        bos.close();
+
+        return  bos.toByteArray();
     }
 
     /**
@@ -106,7 +144,24 @@ public class RsaUtil {
         //数据解密
         Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return cipher.doFinal(data);
+        final int len = data.length;//密文
+        int offset = 0;//偏移量
+        int i = 0;//段数
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        while (len - offset > 0) {
+            byte[] cache;
+            if (len - offset > 128) {
+                cache = cipher.doFinal(data, offset, 128);
+            } else {
+                cache = cipher.doFinal(data, offset, len - offset);
+            }
+            bos.write(cache);
+            i++;
+            offset = 128 * i;
+        }
+        bos.close();
+
+        return bos.toByteArray();
     }
 
     /**
@@ -127,7 +182,24 @@ public class RsaUtil {
         //数据解密
         Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
         cipher.init(Cipher.DECRYPT_MODE, pubKey);
-        return cipher.doFinal(data);
+        final int len = data.length;//密文
+        int offset = 0;//偏移量
+        int i = 0;//段数
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        while (len - offset > 0) {
+            byte[] cache;
+            if (len - offset > 128) {
+                cache = cipher.doFinal(data, offset, 128);
+            } else {
+                cache = cipher.doFinal(data, offset, len - offset);
+            }
+            bos.write(cache);
+            i++;
+            offset = 128 * i;
+        }
+        bos.close();
+
+        return bos.toByteArray();
     }
 
     /**
@@ -201,7 +273,7 @@ public class RsaUtil {
 
         System.out.println("======================== 私钥加密 公钥解密 =============================");
 
-        String str = "这是张三，请确认";
+        String str = "{\"eventCollectId\":1202467984526807042,\"eventDate\":1577323287877,\"eventDesc\":\"测试事件上报\",\"eventLevelId\":1202470885642993664,\"eventTypeId\":1202771456405012482,\"eventValue\":1.0,\"restDeviceId\":1,\"restaurantId\":1}";
         System.out.println("私钥加密前的明文:" + str);
 
         //私钥加密
@@ -216,7 +288,7 @@ public class RsaUtil {
 
 
         //公钥加密
-        str = "我是李四，已收到";
+        str = "{\"eventCollectId\":1202467984526807042,\"eventDate\":1577323287877,\"eventDesc\":\"测试事件上报\",\"eventLevelId\":1202470885642993664,\"eventTypeId\":1202771456405012482,\"eventValue\":1.0,\"restDeviceId\":1,\"restaurantId\":1}";
         System.out.println("公钥加密前的明文:" + str);
         byte[] code2 = RsaUtil.encryptByPublicKey(str.getBytes(), publicKeyStr);
         System.out.println("公钥加密后的数据：" + Base64.encodeBase64String(code2));
