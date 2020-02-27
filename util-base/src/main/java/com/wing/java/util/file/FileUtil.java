@@ -1,4 +1,4 @@
-package com.wing.java.util;
+package com.wing.java.util.file;
 
 import java.io.File;
 
@@ -8,6 +8,11 @@ import java.io.File;
  */
 public class FileUtil {
 
+    /**
+     * 创建目录
+     * @param file
+     * @return
+     */
     public static boolean mkDir(String file) {
         File f = new File(file);
         boolean flag = true;

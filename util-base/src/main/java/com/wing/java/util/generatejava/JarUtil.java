@@ -1,6 +1,6 @@
 package com.wing.java.util.generatejava;
 
-import com.wing.java.util.FileUtil;
+import com.wing.java.util.file.FileUtil;
 
 import java.util.ArrayList;
 import java.util.List;

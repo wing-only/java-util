@@ -1,6 +1,7 @@
 package com.wing.java.util;
 
 import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
@@ -12,15 +13,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.io.*;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * 图片处理工具类
- * 功能：缩放图像、
+ * 功能：
+ * 缩放图像、
  * 切割图像、
  * 图像类型转换、
- * 彩色转黑白、
- * 文字水印、
- * 图片水印等
+ * 图像色彩转换、
+ * 图片水印
  */
 public class ImageUtil {
 
@@ -34,6 +36,9 @@ public class ImageUtil {
     public static String IMAGE_TYPE_BMP = "bmp";        // 英文Bitmap（位图）的简写，它是Windows操作系统中的标准图像文件格式
     public static String IMAGE_TYPE_PSD = "psd";        // Photoshop的专用格式Photoshop
 
+
+//    ============================ 缩放图像 ============================
+
     /**
      * 缩放图像（按比例缩放）
      *
@@ -41,7 +46,7 @@ public class ImageUtil {
      * @param dest  缩放后的图像地址
      * @param scale 缩放系数，缩小时小于1，放大时大于1
      */
-    public final static void scale(String src, String dest, float scale) {
+    public static void scale(String src, String dest, float scale) {
         try {
             BufferedImage srcImg = ImageIO.read(new File(src)); // 读入文件
             int width = srcImg.getWidth();                        // 得到源图宽
@@ -70,7 +75,7 @@ public class ImageUtil {
      * @param width    缩放后的宽度
      * @param isFiller 比例不对时是否需要补白：true为补白; false为不补白;
      */
-    public final static void scale(String src, String dest, int width, int height, boolean isFiller) {
+    public static void scale(String src, String dest, int width, int height, boolean isFiller) {
         try {
             double ratio = 0.0; // 缩放比例
             BufferedImage bi = ImageIO.read(new File(src));
@@ -115,11 +120,10 @@ public class ImageUtil {
      *
      * @param src    源图像文件地址
      * @param result 缩放后的图像地址
-     * @param scale  缩放系数，缩小时小于1，放大时大于1
      * @param height 期望最大高度
      * @param width  期望最大宽度
      */
-    public final static void decrease(String src, String result, int height, int width) {
+    public static void decrease(String src, String result, int height, int width) {
         try {
             BufferedImage srcImg = ImageIO.read(new File(src)); // 读入文件
             int srcWidth = srcImg.getWidth();      //得到源图宽
@@ -148,6 +152,28 @@ public class ImageUtil {
 
     }
 
+    /*
+     * 图片缩放
+     */
+    public static void zoomImage(String src, String dest, int w, int h) throws Exception {
+        double wr = 0, hr = 0;
+        File srcFile = new File(src);
+        File destFile = new File(dest);
+        BufferedImage bufImg = ImageIO.read(srcFile);
+        Image Itemp = bufImg.getScaledInstance(w, h, bufImg.SCALE_SMOOTH);
+        wr = w * 1.0 / bufImg.getWidth();
+        hr = h * 1.0 / bufImg.getHeight();
+        AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(wr, hr), null);
+        Itemp = ato.filter(bufImg, null);
+        try {
+            ImageIO.write((BufferedImage) Itemp, dest.substring(dest.lastIndexOf(".") + 1), destFile);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    //    ============================ 图像切割 ============================
+
     /**
      * 图像切割(按指定起点坐标和宽高切割)
      *
@@ -158,7 +184,7 @@ public class ImageUtil {
      * @param width  目标切片宽度
      * @param height 目标切片高度
      */
-    public final static void cut(String src, String dest, int x, int y, int width, int height) {
+    public static void cut(String src, String dest, int x, int y, int width, int height) {
         try {
             // 读取源图像
             BufferedImage bi = ImageIO.read(new File(src));
@@ -190,7 +216,7 @@ public class ImageUtil {
      * @param rows    目标切片行数。默认2，必须是范围 [1, 20] 之内
      * @param cols    目标切片列数。默认2，必须是范围 [1, 20] 之内
      */
-    public final static void cutByRank(String src, String destDir, int rows, int cols) {
+    public static void cutByRank(String src, String destDir, int rows, int cols) {
         try {
             if (rows <= 0 || rows > 20) rows = 2; // 切片行数
             if (cols <= 0 || cols > 20) cols = 2; // 切片列数
@@ -249,7 +275,7 @@ public class ImageUtil {
      * @param destWidth  目标切片宽度。默认200
      * @param destHeight 目标切片高度。默认150
      */
-    public final static void cutBySquare(String src, String destDir, int destWidth, int destHeight) {
+    public static void cutBySquare(String src, String destDir, int destWidth, int destHeight) {
         try {
             if (destWidth <= 0) destWidth = 200; // 切片宽度
             if (destHeight <= 0) destHeight = 150; // 切片高度
@@ -301,6 +327,8 @@ public class ImageUtil {
         }
     }
 
+    //    ============================ 图像类型转换 ============================
+
     /**
      * 图像类型转换：GIF->JPG、GIF->PNG、PNG->JPG、PNG->GIF(X)、BMP->PNG
      *
@@ -308,7 +336,7 @@ public class ImageUtil {
      * @param formatName 包含格式非正式名称的 String：如JPG、JPEG、GIF等
      * @param dest       目标图像地址
      */
-    public final static void convert(String src, String formatName, String dest) {
+    public static void convert(String src, String formatName, String dest) {
         try {
             File f = new File(src);
             f.canRead();
@@ -321,12 +349,76 @@ public class ImageUtil {
     }
 
     /**
+     * 本地图片转换Base64的方法
+     *
+     * @param imagePath     
+     */
+    public static String image2Base64(String imagePath) {
+        byte[] data = null;
+        // 读取图片字节数组
+        try {
+            InputStream in = new FileInputStream(imagePath);
+            data = new byte[in.available()];
+            in.read(data);
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BASE64Encoder encoder = new BASE64Encoder();
+        return encoder.encode(Objects.requireNonNull(data));
+    }
+
+    /**
+     * 将base64字符串，生成图片
+     */
+    public static File base64ToImage(String base64String, String filePath, String fileName) {
+        BufferedOutputStream bos = null;
+        FileOutputStream fos = null;
+        File file = null;
+        try {
+            File dir = new File(filePath);
+            if (!dir.exists() && dir.isDirectory()) {//判断文件目录是否存在
+                dir.mkdirs();
+            }
+
+            BASE64Decoder decoder = new BASE64Decoder();
+            byte[] bfile = decoder.decodeBuffer(base64String);
+
+            file = new File(filePath + File.separator + fileName);
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
+            bos.write(bfile);
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+    }
+
+    //    ============================ 图像色彩转换 ============================
+
+    /**
      * 彩色转为黑白
      *
      * @param src  源图像地址
      * @param dest 目标图像地址
      */
-    public final static void gray(String src, String dest) {
+    public static void gray(String src, String dest) {
         try {
             BufferedImage srcImg = ImageIO.read(new File(src));
             ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
@@ -337,6 +429,8 @@ public class ImageUtil {
             e.printStackTrace();
         }
     }
+
+    //    ============================ 图像文字水印 ============================
 
     /**
      * 给图片添加文字水印
@@ -352,8 +446,8 @@ public class ImageUtil {
      * @param y         修正值
      * @param alpha     透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
      */
-    public final static void pressText(String src, String dest, String pressText, String fontName, int fontStyle, Color color, int fontSize,
-                                       int x, int y, float alpha) {
+    public static void pressText(String src, String dest, String pressText, String fontName, int fontStyle, Color color, int fontSize,
+                                 int x, int y, float alpha) {
         try {
             Image srcImg = ImageIO.read(new File(src));
             int width = srcImg.getWidth(null);
@@ -390,8 +484,8 @@ public class ImageUtil {
      * @param y         修正值
      * @param alpha     透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
      */
-    public final static void pressText2(String src, String dest, String pressText, String fontName,
-                                        int fontStyle, Color color, int fontSize, int x, int y, float alpha) {
+    public static void pressText2(String src, String dest, String pressText, String fontName,
+                                  int fontStyle, Color color, int fontSize, int x, int y, float alpha) {
         try {
             Image srcImg = ImageIO.read(new File(src));
             int width = srcImg.getWidth(null);
@@ -421,7 +515,7 @@ public class ImageUtil {
      * @param y        修正值。 默认在中间
      * @param alpha    透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
      */
-    public final static void pressImage(String src, String dest, String pressImg, int x, int y, float alpha) {
+    public static void pressImage(String src, String dest, String pressImg, int x, int y, float alpha) {
         try {
             Image srcImg = ImageIO.read(new File(src));
             int wideth = srcImg.getWidth(null);
@@ -449,7 +543,7 @@ public class ImageUtil {
      * @param text
      * @return
      */
-    public final static int getLength(String text) {
+    private static int getLength(String text) {
         int length = 0;
         for (int i = 0; i < text.length(); i++) {
             if (new String(text.charAt(i) + "").getBytes().length > 1) {
@@ -461,6 +555,7 @@ public class ImageUtil {
         return length / 2;
     }
 
+    //    ============================ 图像裁剪 ============================
 
     /*
      * 根据尺寸图片居中裁剪
@@ -554,35 +649,12 @@ public class ImageUtil {
         ImageIO.write(bi, "jpg", new File(dest));
     }
 
-    /*
-     * 图片缩放
-     */
-    public static void zoomImage(String src, String dest, int w, int h) throws Exception {
-        double wr = 0, hr = 0;
-        File srcFile = new File(src);
-        File destFile = new File(dest);
-        BufferedImage bufImg = ImageIO.read(srcFile);
-        Image Itemp = bufImg.getScaledInstance(w, h, bufImg.SCALE_SMOOTH);
-        wr = w * 1.0 / bufImg.getWidth();
-        hr = h * 1.0 / bufImg.getHeight();
-        AffineTransformOp ato = new AffineTransformOp(AffineTransform.getScaleInstance(wr, hr), null);
-        Itemp = ato.filter(bufImg, null);
-        try {
-            ImageIO.write((BufferedImage) Itemp, dest.substring(dest.lastIndexOf(".") + 1), destFile);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 
+    //    ============================ 测试 ============================
 
-    /**
-     * 程序入口：用于测试
-     *
-     * @throws IOException
-     */
     public static void main(String[] args) throws IOException {
 
-        cutCenter("e:/abc.jpg", "e:/abc_cut.jpg", 512, 320);
+//        cutCenter("e:/abc.jpg", "e:/abc_cut.jpg", 512, 320);
 
         // 1-缩放图像：
         // 方法一：按比例缩放
@@ -612,5 +684,10 @@ public class ImageUtil {
 
         // 6-给图片添加图片水印：
 //        ImageUtil.pressImage("e:/abc2.jpg", "e:/abc.jpg", "e:/abc_pressImage.jpg", 0, 0, 0.5f);
+
+
+        String base64String = image2Base64("G:/3620.jpg");
+        System.out.println(base64String);
+        base64ToImage(base64String, "G:", "3621.jpg");
     }
 }
