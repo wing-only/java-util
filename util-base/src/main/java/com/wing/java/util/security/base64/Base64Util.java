@@ -1,4 +1,4 @@
-package com.wing.java.util;
+package com.wing.java.util.security.base64;
 
 /**
  * @author wing
