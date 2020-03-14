@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wing.java</groupId>
     <artifactId>java-util</artifactId>
-    <version>2.1.7</version>
+    <version>4.3.14</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.wing.java</groupId>
-        <artifactId>java-spring-boot-parent</artifactId>
-        <version>2.1.7</version>
+        <artifactId>java-spring-parent</artifactId>
+        <version>4.3.14</version>
     </parent>
 
     <modules>
