@@ -1,7 +1,5 @@
 package com.wing.java.util;
 
-import cn.hutool.core.date.DateTime;
-
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,6 +32,8 @@ public class DateUtil {
 	public static final String HHmmssS = "HHmmssS";
 	public static final String HHmmss = "HHmmss";
 
+
+//	======================================= 格式转换 =======================================
 
 	/**
 	 * 根据指定格式转换指定日期
@@ -136,20 +136,6 @@ public class DateUtil {
 		cl.add(Calendar.MONTH, -6);
 		return new SimpleDateFormat(format).format(cl.getTime());
 	}
-
-	/**
-	 * 获取上一周的日期
-	 * @return
-	 */
-	public static String getLastWeekDate() {
-		Format f = new SimpleDateFormat(yyyy_MM_dd);
-		Calendar c = Calendar.getInstance();
-		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-		int lastSunday = 7 - dayOfWeek + 1;
-		c.set(Calendar.DAY_OF_MONTH, -lastSunday);
-		return f.format(c.getTime());
-	}
-
 	
 	public static int getYear(Date date) {
 		Calendar cal = Calendar.getInstance();
@@ -185,6 +171,16 @@ public class DateUtil {
 	public static int getCurrentMonth() {
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.MONTH) + 1;
+	}
+
+	/**
+	 * 获取当前月的某一天
+	 * @return
+	 */
+	public static Date getDayOfCurrentMonth(int dayOfMonth) {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+		return c.getTime();
 	}
 
 	/**
@@ -233,6 +229,16 @@ public class DateUtil {
 	public static int getCurrenWeekOfMonth() {
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.WEEK_OF_MONTH);
+	}
+
+	/**
+	 * 获取当前周的某一天
+	 * @return
+	 */
+	public static Date getDayOfCurrenWeek(int dayOfWeek) {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+		return c.getTime();
 	}
 
 	/**
@@ -363,8 +369,8 @@ public class DateUtil {
 	}
 
 	public enum TimeUnit{
-		DAY(Calendar.DAY_OF_MONTH, "天"),
-		HOUR(Calendar.HOUR_OF_DAY, "时"),
+		DAY_OF_MONTH(Calendar.DAY_OF_MONTH, "天"),
+		HOUR_OF_DAY(Calendar.HOUR_OF_DAY, "时"),
 		MINUTE(Calendar.MINUTE, "分"),
 		SECOND(Calendar.SECOND, "秒");
 
