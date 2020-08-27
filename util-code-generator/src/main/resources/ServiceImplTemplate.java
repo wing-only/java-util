@@ -17,7 +17,7 @@ import @voPackage@.@ModelName@QryRespVo;
 import @voPackage@.@ModelName@QryReqVo;
 
 @Service
-@Transactional
+//@Transactional
 @Slf4j
 public class @modelName@ServiceImpl extends BaseServiceImpl<@modelName@Dao,@modelName@,@modelName@QryRespVo,@modelName@QryReqVo> implements I@modelName@Service {
 
