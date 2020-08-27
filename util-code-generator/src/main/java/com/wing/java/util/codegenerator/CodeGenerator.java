@@ -1,6 +1,5 @@
 package com.wing.java.util.codegenerator;
 
-import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -21,15 +20,15 @@ public class CodeGenerator extends AbstractMojo {
     private MavenProject project;
 
     @Parameter(property = "configFile",
-            defaultValue = "${project.basedir}\\src\\main\\resources\\codeGenerator.properties")
+            defaultValue = "${project.basedir}/src/main/resources/codeGenerator.properties")
     private String configFile;
 
     @Parameter(property = "baseOutputDirectory",
-            defaultValue = "${project.basedir}\\src\\main\\java\\")
+            defaultValue = "${project.basedir}/src/main/java/")
     private String baseOutputDirectory;
-    
+
     @Parameter(property = "baseOutputResourcesDirectory",
-    		defaultValue = "${project.basedir}\\src\\main\\resources\\")
+            defaultValue = "${project.basedir}/src/main/resources/")
     private String baseOutputResourcesDirectory;
 
 
