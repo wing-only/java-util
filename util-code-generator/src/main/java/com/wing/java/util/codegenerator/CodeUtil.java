@@ -61,7 +61,7 @@ public class CodeUtil {
 	// req模板文件  时间条件
 	String QryReqVoTemplateFile = "QryReqVoTemplate.java";
 	// resp模板文件  枚举
-	String QryRespVoTemplateFile = "QryRespVoTemplate.java";
+	String QryRespVoTemplateFile = "QryRspVoTemplate.java";
 	//dubbo模板
 	String dubboConfigFile = "dubbo.txt";
 
@@ -132,6 +132,7 @@ public class CodeUtil {
 		sql2jdbctypes.put("ENUM", "CHAR");
 		sql2jdbctypes.put("VARCHAR", "VARCHAR");
 		sql2jdbctypes.put("TINYINT", "TINYINT");
+		sql2jdbctypes.put("SMALLINT", "SMALLINT");
 		sql2jdbctypes.put("INT", "INTEGER");
 		sql2jdbctypes.put("BIGINT", "BIGINT");
 		sql2jdbctypes.put("FLOAT", "REAL");
@@ -149,9 +150,10 @@ public class CodeUtil {
 		jdbc2javatypes.put("VARCHAR", "String");
 		jdbc2javatypes.put("BIGINT", "Long");
 		jdbc2javatypes.put("TINYINT", "Byte");
+		jdbc2javatypes.put("SMALLINT", "Integer");
+		jdbc2javatypes.put("INTEGER", "Integer");
 		jdbc2javatypes.put("DATE", "Date");
 		jdbc2javatypes.put("DOUBLE", "Double");
-		jdbc2javatypes.put("INTEGER", "Integer");
 		jdbc2javatypes.put("TIMESTAMP", "Date");
 		jdbc2javatypes.put("DECIMAL", "BigDecimal");
 		jdbc2javatypes.put("ENUM", "String");
