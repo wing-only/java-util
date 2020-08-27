@@ -11,10 +11,10 @@ import java.util.Map;
  * @author wing
  * @create 2018-12-09 10:15
  */
-public class Result extends RespParam<HashMap<String, Object>> {
+public class Result extends RspParam<HashMap<String, Object>> {
 
     public Result() {
-        this.code = 1;
+        this.code = ExceptionConstant.SUCCESS;
         this.msg = "success";
         this.data = new HashMap();
     }

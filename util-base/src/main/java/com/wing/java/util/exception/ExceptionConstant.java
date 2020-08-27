@@ -8,8 +8,8 @@ public interface ExceptionConstant {
     /**
      * HTTP 请求 错误编码
      */
-    int ERROR = 0;          //通用错误编码
-    int SUCCESS = 1;        //成功编码
+    int SUCCESS = 0;        //成功编码
+    int ERROR = 1;          //通用错误编码
     int SC_CONTINUE = 100;
     int SC_SWITCHING_PROTOCOLS = 101;
     int SC_PROCESSING = 102;
